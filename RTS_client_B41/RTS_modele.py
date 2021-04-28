@@ -61,11 +61,6 @@ class SimpleTimer():
     def stop(self): 
         self.counter = self.interval = 0
 
-
-
-
-
-
 class Batiment():
     def __init__(self,parent,id,x,y):
         self.parent=parent
@@ -82,7 +77,7 @@ class Batiment():
         # Stats de defenses des bâtiments, doivent être spécifié dans les sous-classes
         self.alive = True
         self.health = 0
-        self.defense = 2+ARMOR_TYPES.HEAVY
+        self.defense = ARMOR_TYPES.HEAVY
 
     def die(self):
         self.alive = False
@@ -92,17 +87,16 @@ class Batiment():
 
 #Incomplet pour l'instant
 class ProductionBuilding(Batiment):
-    def __init__(self,id,x,y):
+    def __init__(self,parent,id,x,y):
+        Batiment.__init__(self,parent,id,x,y)
+
         self.x = x
         self.y = y
         self.id= id
-        
-
 
 class Maison(ProductionBuilding):
     def __init__(self,parent,id,couleur,x,y,montype):
-        Batiment.__init__(self,parent,id,x,y)
-        Batiment.populationMax += self.maxperso
+        ProductionBuilding.populationMax += self.maxperso
         self.image=couleur[0]+"_"+montype
         self.montype=montype
         self.maxperso=10
@@ -116,7 +110,7 @@ class Maison(ProductionBuilding):
 class Stable(ProductionBuilding):
     def __init__(self,parent,id,couleur,x,y,montype):
         Batiment.__init__(self,parent,id,x,y)
-        Batiment.populationMax += self.maxperso
+        ProductionBuilding.populationMax += self.maxperso
         self.image=couleur[0]+"_"+montype
         self.montype=montype
         self.maxperso=5
@@ -129,7 +123,7 @@ class Stable(ProductionBuilding):
 
 class ChickenCoop(ProductionBuilding):
     def __init__(self,parent,id,couleur,x,y,montype):
-        Batiment.__init__(self,parent,id,x,y)
+        ProductionBuilding.__init__(self,parent,id,x,y)
         self.image=couleur[0]+"_"+montype
         self.montype=montype
         self.maxperso=20
@@ -141,7 +135,7 @@ class ChickenCoop(ProductionBuilding):
 
 class Barn(ProductionBuilding):
     def __init__(self,parent,id,couleur,x,y,montype):
-        Batiment.__init__(self,parent,id,x,y)
+        ProductionBuilding.__init__(self,parent,id,x,y)
         self.image=couleur[0]+"_"+montype
         self.montype=montype
         self.maxperso=20
@@ -152,9 +146,9 @@ class Barn(ProductionBuilding):
         self.defense = 2
         self.armor = ARMOR_TYPES.HEAVY
 
-class PigHouse(ProductionBuilding):
+class Pigpen(ProductionBuilding):
     def __init__(self,parent,id,couleur,x,y,montype):
-        Batiment.__init__(self,parent,id,x,y)
+        ProductionBuilding.__init__(self,parent,id,x,y)
         self.image=couleur[0]+"_"+montype
         self.montype=montype
         self.maxperso=20
@@ -166,16 +160,6 @@ class PigHouse(ProductionBuilding):
     
     def createUnit(self,Pig):
         self.perso += 1
-
-
-
-
-
-
-
-
-
-
 
 class Daim():
     def __init__(self,parent,id,x,y):
@@ -696,7 +680,7 @@ class Ouvrier(Perso):
                         self.parent.ressources["nourriture"]+=self.ramassage
                     else:
                         self.parent.ressources[self.typeressource]+=self.ramassage
-                    self.ramassage=0
+                        self.ramassage=0
                     if self.cibleressource:
                         self.cibler([self.cibleressource.x,self.cibleressource.y])
                         self.actioncourante="ciblerressource"
@@ -883,7 +867,6 @@ class Joueur():
         # Pour debug plus rapidement
         if DebugSettings.createAllUnitsAndBuildings:
             idCaserne = getprochainid()
-            self.batiments["caserne"][idCaserne]= Caserne(self,idCaserne ,self.couleur, x + 25 , y - 100,"caserne")    # Peut crash si spawn trop près d'une bordure, probablement
             self.creerperso(["soldat","caserne",idCaserne,[]])
     
     def construirebatiment(self,param):
@@ -941,10 +924,7 @@ class Partie():
         self.delaiprochaineaction=20
         self.joueurs={}
         self.classesbatiments={"maison":Maison,
-                        "caserne":Caserne,
-                        "abri":Abri,
-                        "chickenCoop":ChickenCoop,
-                        "pigPen":PigPen}
+                        "chickenCoop":ChickenCoop}
         self.classespersos={"ouvrier":Ouvrier,
                     "soldat":Soldat,
                     "archer":Archer,
