@@ -72,7 +72,7 @@ class DebugSettings(): # Va permettre de dbug bien des affaires
     # Settings de lancement de partie
     spawnPlayersNearby = True   # Spawn tout les joueurs très proche
     generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
-    createAllUnitsAndBuildings = True   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
+    createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
     quickStart = True           # Reset create et launch une partie, immédiatement
 
 class ARMOR_TYPES():
@@ -275,9 +275,9 @@ class PigPen(Batiment):
         self.defense = 2
         self.armor = ARMOR_TYPES.HEAVY
 
-class Pigpen(ProductionBuilding):
+class Pigpen(Batiment):
     def __init__(self,parent,id,couleur,x,y,montype):
-        ProductionBuilding.__init__(self,parent,id,x,y)
+        Batiment.__init__(self,parent,id,x,y)
         self.image=couleur[0]+"_"+montype
         self.montype=montype
         self.maxperso=20
@@ -1241,7 +1241,7 @@ class Joueur():
         id=getprochainid()
         batiment=self.batiments[batimentsource][idbatiment]
         
-        x=batiment.x+100+(random.randrange(50)-15)
+        x=batiment.x +100+(random.randrange(50)-15)
         y=batiment.y +(random.randrange(50)-15)
             
         #if sorteperso == "ouvrier":
