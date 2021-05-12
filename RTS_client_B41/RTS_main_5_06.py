@@ -250,9 +250,6 @@ class Controleur():
         
     def afficherbio(self,bio):
         self.vue.afficherbio(bio)
-    
-    def ajustSiloLoyalty(self):
-        self.vue.changeSiloLoyalty = 1
 
 if __name__ == '__main__':
     c=Controleur()
