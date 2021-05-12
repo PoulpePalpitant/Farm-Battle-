@@ -52,7 +52,7 @@ class Vue():
         self.cadrejeuinfo.config(bg=coul[1])
         self.creeraide()
         self.createCost()
-        self.creercadreouvrier(coul[0]+"_",["maison","caserne","chickenCoop","pigPen"])
+        self.creercadreouvrier(coul[0]+"_",["maison","chickenCoop","pigPen"])
         self.creerchatter()
         # on affiche les maisons, point de depart des divers joueurs
         self.afficherdepart()
