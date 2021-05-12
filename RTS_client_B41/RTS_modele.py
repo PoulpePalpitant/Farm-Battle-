@@ -139,14 +139,15 @@ class Batiment():
             self.alive = True
         else:
             # Le prototype de base va avoir ces stats. Tout les clones vont copier les attributs du prototype de bases
-            self.health = 0
+            self.health = self.maxHealth = 0
             self.defense = 2
-            self.maxperso=0
-            self.perso=0
+            self.maxperso = 0
+            self.perso = 0
             self.armorType = ARMOR_TYPES.HEAVY
 
     def copyAttributes(self, prototype):  
         self.health = prototype.health
+        self.maxHealth = prototype.health
         self.defense = prototype.defense
         self.armorType = prototype.armorType
         self.maxperso = prototype.maxperso
@@ -176,7 +177,7 @@ class Maison(Batiment):
             self.copyAttributes(prototype)
         else:
             # Stats de defenses 
-            self.health = 300
+            self.health = self.maxHealth = 300
             self.defense = 2
             self.maxperso=10    # useless for now
             self.perso=0        # useless for now
@@ -196,7 +197,7 @@ class Abri(Batiment):
             self.copyAttributes(prototype)
         else:
             # Stats de defenses 
-            self.health = 300
+            self.health = self.maxHealth = 300
             self.defense = 2
             self.maxperso=20
             self.perso=0
@@ -216,7 +217,7 @@ class Caserne(Batiment):
             self.copyAttributes(prototype)
         else:
             # Stats de defenses 
-            self.health = 300
+            self.health = self.maxHealth = 300
             self.defense = 2
             self.maxperso=20
             self.perso=0
@@ -238,7 +239,7 @@ class ChickenCoop(Batiment):
             self.perso=0
         else:
             # Stats de defenses 
-            self.health = 500
+            self.health = self.maxHealth = 500
             self.defense = 2
 
     def copyAttributes(self, prototype):
@@ -259,7 +260,7 @@ class PigPen(Batiment):
 
         else:
             # Stats de defenses 
-            self.health = 500
+            self.health = self.maxHealth = 500
             self.defense = 2
             self.maxperso=20
             self.perso=0
@@ -501,6 +502,8 @@ class Perso():
             self.x=x
             self.y=y
             
+            self.movingIn = False
+            
             # S'ajoute sur la map
             caseX,caseY = self.parent.parent.trouvercase(x, y)           
             self.parent.parent.hashmap[caseX][caseY]["persos"].append(self)    
@@ -519,6 +522,7 @@ class Perso():
 
         else: # Le prototype de base va avoir ces stats. Tout les clones vont copier les attributs du prototype
             self.health = 0
+            self.maxHealth = 0
             self.defense = 0
             self.vitesse = 5
             self.champvision = 200
@@ -534,6 +538,7 @@ class Perso():
 
     def copyAttributes(self, prototype):  # MUST BE TESTED
         self.health = prototype.health
+        self.maxHealth = prototype.health
         self.defense = prototype.defense
         self.vitesse = prototype.vitesse
         self.champvision = prototype.champvision
@@ -572,7 +577,7 @@ class Perso():
                 self.targetNearestEnnemy()
             
     def deplacer(self):
-        if self.cible:
+        if self.cible and self.movingIn:
             ang=Helper.calcAngle(self.x,self.y,self.cible[0],self.cible[1])  
             x,y=Helper.getAngledPoint(ang,self.vitesse,self.x,self.y)
             
@@ -607,7 +612,7 @@ class Perso():
     def attack(self):        
         if self.attackTarget and self.attackTarget.alive:    # Cible pas dead
             if Helper.withinDistance(self.x, self.y, self.attackTarget.x, self.attackTarget.y, self.atkRange):    # Range d'attack
-                self.cible = None   # Arrêt du mouvement si peut attaquer à distance
+                self.movingIn = False   # Arrêt du mouvement si peut attaquer à distance
                 if self.canAttack:  # Si le cooldown de l'attaque est terminé
                     self.attackTarget.health = self.dealDamage(self.attackTarget)
                     self.attackTimer.set(self.atkSpeed) # Start cooldown pour prochaine attaque quand même. Tuer une cible ne reset pas le cooldown d'attaque
@@ -619,7 +624,10 @@ class Perso():
                     self.resetAction()
                     
                 return
-            
+            else:
+                if self.movingIn == False:
+                    self.movingIn = True
+                        
             if self.cible == None:
                 self.cibler([self.attackTarget.x, self.attackTarget.y])
         else:
@@ -640,6 +648,7 @@ class Perso():
         return target.health - dmg
 
     def resetAction(self):
+        self.movingIn = False
         self.cible = self.attackTarget = self.actioncourante = None
 
 
@@ -663,6 +672,8 @@ class Perso():
         else:
             self.dir="G"
         self.image=self.image[:-1]+self.dir
+
+        self.movingIn = True
 
 
     # Une autre méthodes pourrait être intégré pour prioriser les ennemies les plus 'dangereux', au besoin
@@ -705,7 +716,7 @@ class Soldat(Perso):
             self.copyAttributes(prototype)
         else:
             # Stats de combats
-            self.health = 100
+            self.health = self.maxHealth = 100
             self.defense = 0
             self.atkDmg = 6
             self.atkSpeed = 5
@@ -724,7 +735,7 @@ class Archer(Perso):
             self.copyAttributes(prototype)
         else:
             # Stats de combats
-            self.health = 60
+            self.health = self.maxHealth = 60
             self.defense = 0
             self.atkRange = 30   
             self.atkSpeed = 7
@@ -744,7 +755,7 @@ class Chevalier(Perso):
             self.copyAttributes(prototype)
         else:
             # Stats de combats
-            self.health = 200
+            self.health = self.maxHealth = 200
             self.defense = 1
             self.armorType = ARMOR_TYPES.HEAVY
             self.atkDmg = 15
@@ -774,7 +785,7 @@ class Chicken(Perso):
             self.copyAttributes(prototype)
         else:
             # Stats de combats
-            self.health = 200
+            self.health = self.maxHealth = 200
             self.defense = 1
             self.armorType = ARMOR_TYPES.LIGHT
             self.atkDmg = 15
@@ -796,7 +807,7 @@ class Pig(Perso):
             self.copyAttributes(prototype)
         else:
             # Stats de combats
-            self.health = 400
+            self.health = self.maxHealth = 400
             self.defense = 1
             self.armorType = ARMOR_TYPES.HEAVY
             self.atkDmg = 30
@@ -833,7 +844,7 @@ class Ouvrier(Perso):
         else:
             # Stats du prototype de base
             self.vitesse=random.randrange(5)+5
-            self.health = 50
+            self.health = self.maxHealth = 50
             self.defense = 0
             self.atkDmg = 2
             self.atkSpeed = 5
