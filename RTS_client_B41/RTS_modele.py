@@ -13,13 +13,8 @@ class DebugSettings(): # Va permettre de dbug bien des affaires
     showAttackRange = True      # Indicateur du range d'attack des unités
     
     # Settings de lancement de partie
-<<<<<<< HEAD
     spawnPlayersNearby = False   # Spawn tout les joueurs très proche
     generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
-=======
-    spawnPlayersNearby = True   # Spawn tout les joueurs très proche
-    generateAi = False           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
->>>>>>> 1770aa9463f79c4dc9b32fee7190bf2a1d01055f
     createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
     quickStart = True           # Reset create et launch une partie, immédiatement
 
