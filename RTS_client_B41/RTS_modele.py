@@ -13,7 +13,7 @@ class DebugSettings(): # Va permettre de dbug bien des affaires
     showAttackRange = True      # Indicateur du range d'attack des unités
     
     # Settings de lancement de partie
-    spawnPlayersNearby = True   # Spawn tout les joueurs très proche
+    spawnPlayersNearby = False   # Spawn tout les joueurs très proche
     generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
     createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
     quickStart = True           # Reset create et launch une partie, immédiatement
@@ -952,7 +952,7 @@ class Joueur():
         # on va creer une maison comme centre pour le joueur
         self.creerpointdorigine(x,y)
         self.completedUpgrades = {}     # ex : {"Protein shakes": ProteinShake}
-        UpgradeRegistry.UPGRADES["Defense Tier 3"].effect(self)
+        # Utilisés comme ceci : UpgradeRegistry.UPGRADES["Defense Tier 3"].effect(self)
         
     def addToListOfDeadStuff(self, isPerso, type, id):
         if isPerso:
