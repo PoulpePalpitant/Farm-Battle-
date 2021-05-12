@@ -252,7 +252,7 @@ class ChickenCoop(Batiment):
         return ChickenCoop(parent,id,couleur,x,y,montype, prototype)
 
 class PigPen(Batiment):
-    def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
+    def __init__(self,parent,id,couleur,x,y, montype, prototype = None):
         Batiment.__init__(self,parent,id, couleur,x, y, montype, prototype)
         
         if prototype:
@@ -260,10 +260,8 @@ class PigPen(Batiment):
 
         else:
             # Stats de defenses 
-            self.health = self.maxHealth = 500
-            self.defense = 2
-            self.maxperso=20
-            self.perso=0
+            self.health    = self.maxHealth = 500
+            self.defense   = 2
 
     def copyAttributes(self, prototype):
         super().copyAttributes(prototype)
@@ -275,21 +273,6 @@ class PigPen(Batiment):
         self.health = 300
         self.defense = 2
         self.armor = ARMOR_TYPES.HEAVY
-
-class Pigpen(Batiment):
-    def __init__(self,parent,id,couleur,x,y,montype):
-        Batiment.__init__(self,parent,id,x,y)
-        self.image=couleur[0]+"_"+montype
-        self.montype=montype
-        self.maxperso=20
-        self.perso=0
-        # Stats de defenses 
-        self.health = 400
-        self.defense = 2
-        self.armor = ARMOR_TYPES.MEDIUM
-    
-    def createUnit(self,Pig):
-        self.perso += 1
 
 class Daim():
     def __init__(self,parent,id,x,y):
@@ -633,7 +616,6 @@ class Perso():
         else:
             self.resetAction()
 
-        
     
     def dealDamage(self, target):
         # Check si ya boost de dmg selon le type d'armor et de dmg
@@ -802,7 +784,6 @@ class Pig(Perso):
     def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
         Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
         
-        
         if prototype:
             self.copyAttributes(prototype)
         else:
@@ -812,7 +793,6 @@ class Pig(Perso):
             self.armorType = ARMOR_TYPES.HEAVY
             self.atkDmg = 30
             self.atkSpeed = 2
-
 
     def copyAttributes(self, prototype):
         super().copyAttributes(prototype)
@@ -1074,10 +1054,24 @@ class Joueur():
         self.nom=nom
         self.id=id
         self.x=x 
-        self.y=y 
+        self.y=y
+        self.popMaxDuBatiment={"maison":1,
+                       "abri":1,
+                       "caserne":0,
+                       "chickenCoop":0,
+                       "pigPen":0}
+
+        self.popActuel={"ouvrier":0,
+                   "soldat":0,
+                   "archer":0,
+                   "chevalier":0,
+                   "druide":0,
+                   "chicken":0,
+                   "pig":0}
         self.couleur=couleur
         self.monchat=[]
         self.chatneuf=0
+
         self.ressourcemorte=[]#
         self.ressources={"nourriture":200,
                          "arbre":200,
@@ -1211,9 +1205,6 @@ class Joueur():
             self.batiments["chickenCoop"][nextId]= ChickenCoop(self,nextId ,self.couleur, x + 25 , y - 100,"chickenCoop")    # Peut crash si spawn trop près d'une bordure, probablement
             self.creerperso(["chicken","chickenCoop",nextId,[]])
 
-            
-        
-    
     def construirebatiment(self,param):
         sorte,pos=param
         id=getprochainid()
@@ -1221,7 +1212,6 @@ class Joueur():
         self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte, self.prototypeBatiments[sorte])
         # self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte)
         batiment=self.batiments[sorte][id]
-        
         
         self.parent.parent.afficherbatiment(self.nom,batiment)
         self.parent.parent.vue.root.update()
@@ -1231,7 +1221,7 @@ class Joueur():
         for i in cartebatiment:
             self.parent.cartecase[i[1]][i[0]]=9
         batiment.cartebatiment=cartebatiment
-
+        self.popMaxDuBatiment[sorte] += 5
 # CORRECTION REQUISE : la fonction devrait en faire la demande a l'ouvrier concerne 
 # trouvercible ne veut rien dire ici... à changer       
     def ouvrierciblermaison(self,listparam):
@@ -1256,7 +1246,11 @@ class Joueur():
         y=batiment.y +(random.randrange(50)-15)
             
         #if sorteperso == "ouvrier":
-        self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
+        if self.popActuel[sorteperso] < self.popMaxDuBatiment[batimentsource]:
+            self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
+            self.popActuel[sorteperso] += 1
+        else:
+            print("OH NON!")
         #else:    
         #    self.persos[sorteperso][id]=Joueur.classespersos[sorteperso](self,id,batiment,self.couleur,x,y,sorteperso)
 
