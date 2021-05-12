@@ -152,26 +152,6 @@ class Abri(Batiment):
 
     def clone(parent,id,couleur,x,y,montype, prototype):       
         return Abri(parent,id,couleur,x,y,montype, prototype)
-        
-class Caserne(Batiment):
-    def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
-        Batiment.__init__(self,parent,id, couleur, x, y, montype, prototype)
-
-
-        if prototype:
-            self.copyAttributes(prototype)
-        else:
-            # Stats de defenses 
-            self.health = self.maxHealth = 300
-            self.defense = 2
-            self.maxperso=20
-            self.perso=0
-
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,couleur,x,y,montype, prototype):       
-        return Caserne(parent,id,couleur,x,y,montype, prototype)
 
 class ChickenCoop(Batiment):
     def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
@@ -547,7 +527,6 @@ class Perso():
                 if self.attackTarget.health <= 0: # Si la cible meurt ici, faut arrêter de la target
                     self.attackTarget.die() # et la buter
                     self.resetAction()
-                    
                 return
             else:
                 if self.movingIn == False:
@@ -630,77 +609,6 @@ class Perso():
             return True
         else:
             return False
-
-
-
-class Soldat(Perso):
-    def __init__(self,parent,id,maison,couleur,x,y,montype, prototype = None):
-        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
-        
-        if prototype:
-            self.copyAttributes(prototype)
-        else:
-            # Stats de combats
-            self.health = self.maxHealth = 100
-            self.defense = 0
-            self.atkDmg = 6
-            self.atkSpeed = 5
-
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
-        return Soldat(parent,id,batiment,couleur,x,y,montype, prototype)
-
-class Archer(Perso):
-    def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
-        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
-        
-        if prototype:
-            self.copyAttributes(prototype)
-        else:
-            # Stats de combats
-            self.health = self.maxHealth = 60
-            self.defense = 0
-            self.atkRange = 30   
-            self.atkSpeed = 7
-
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
-        return Archer(parent,id,batiment,couleur,x,y,montype, prototype)
-
-
-class Chevalier(Perso):
-    def __init__(self,parent,id,maison,couleur,x,y,montype, prototype = None):
-        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
-        
-        if prototype:
-            self.copyAttributes(prototype)
-        else:
-            # Stats de combats
-            self.health = self.maxHealth = 200
-            self.defense = 1
-            self.armorType = ARMOR_TYPES.HEAVY
-            self.atkDmg = 15
-            self.atkSpeed = 2
-
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
-        return Chevalier(parent,id,batiment,couleur,x,y,montype, prototype)
-
-class Druide(Perso):
-    def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
-        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
-
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
-        return Druide(parent,id,batiment,couleur,x,y,montype, prototype)
 
 class Chicken(Perso):
     def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
@@ -987,10 +895,6 @@ class Ouvrier(Perso):
         
 class Joueur():
     classespersos={"ouvrier":Ouvrier,
-                   "soldat":Soldat,
-                   "archer":Archer,
-                   "chevalier":Chevalier,
-                   "druide":Druide,
                    "chicken":Chicken,
                    "pig":Pig}
     def __init__(self,parent,id,nom,couleur, x,y):
@@ -1010,23 +914,14 @@ class Joueur():
                          "aureus":200}
         
         self.persos={"ouvrier":{},
-                    "soldat":{},
-                    "archer":{},
-                    "chevalier":{},
-                    "druide":{},
                     "chicken":{},
                     "pig":{}}
         
         self.prototypePersos={"ouvrier": self.classespersos["ouvrier"](None, None, None,None,None,None,None,None), #none! yep, overloading constructor would prevent that.
-                    "soldat":self.classespersos["soldat"](None, None, None,None,None,None,None,None),
-                    "archer":self.classespersos["archer"](None, None, None,None,None,None,None,None),
-                    "chevalier":self.classespersos["chevalier"](None, None, None,None,None,None,None,None),
-                    "druide":self.classespersos["druide"](None, None, None,None,None,None,None,None),
                     "chicken":self.classespersos["chicken"](None, None, None,None,None,None,None,None),
                     "pig":self.classespersos["pig"](None, None, None,None,None,None,None,None)}
 
         self.prototypeBatiments={"maison": self.parent.classesbatiments["maison"](None, None, None,None,None,None,None), 
-                    "caserne":self.parent.classesbatiments["caserne"](None, None, None,None,None,None,None),
                     "abri":self.parent.classesbatiments["abri"](None, None, None,None,None,None,None),
                     "chickenCoop":self.parent.classesbatiments["chickenCoop"](None, None, None,None,None,None,None),
                     "pigPen":self.parent.classesbatiments["pigPen"](None, None, None,None,None,None,None)
@@ -1034,7 +929,6 @@ class Joueur():
 
         self.batiments={"maison":{},
                        "abri":{},
-                       "caserne":{},
                        "chickenCoop":{},
                        "pigPen":{}}
         
@@ -1202,15 +1096,10 @@ class Partie():
         self.delaiprochaineaction=20
         self.joueurs={}
         self.classesbatiments={"maison":Maison,
-                        "caserne":Caserne,
                         "abri":Abri,
                         "chickenCoop":ChickenCoop,
                         "pigPen":PigPen}
         self.classespersos={"ouvrier":Ouvrier,
-                    "soldat":Soldat,
-                    "archer":Archer,
-                    "chevalier":Chevalier,
-                    "druide":Druide,
                     "chicken":Chicken,
                     "pig":Pig}
         self.ressourcemorte=[]
