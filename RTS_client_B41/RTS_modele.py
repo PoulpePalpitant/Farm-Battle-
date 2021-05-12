@@ -14,7 +14,7 @@ class DebugSettings(): # Va permettre de dbug bien des affaires
     
     # Settings de lancement de partie
     spawnPlayersNearby = True   # Spawn tout les joueurs très proche
-    generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
+    generateAi = False           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
     createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
     quickStart = True           # Reset create et launch une partie, immédiatement
 
@@ -997,8 +997,12 @@ class Joueur():
         self.couleur=couleur
         self.monchat=[]
         self.chatneuf=0
+        self.timerUnits=None
+        self.timerHouses=None #SimpleTimer(self, 15)
+        self.unitParam=None
+        self.houseParam=None
         self.ressourcemorte=[]#
-        self.ressources={"nourriture":200,
+        self.ressources={"nourriture":300,
                          "arbre":200,
                          "roche":200,
                          "aureus":200}
@@ -1024,6 +1028,12 @@ class Joueur():
                        "caserne":{},
                        "chickenCoop":{},
                        "pigPen":{}}
+        
+        self.costs={"unit":{"nourriture":100, "arbre":0, "roche":0, "aureus":0},
+                    "maison":{"nourriture":0, "arbre":100, "roche":100, "aureus":0},
+                    "caserne":{"nourriture":0, "arbre":100, "roche":150, "aureus":0},
+                    "chickenCoop":{"nourriture":0, "arbre":150, "roche":100, "aureus":0},
+                    "pigPen":{"nourriture":0, "arbre":125, "roche":125, "aureus":0}}
         
         self.actions={"creerperso":self.creerperso,
                       "ouvrierciblermaison":self.ouvrierciblermaison,
@@ -1129,18 +1139,20 @@ class Joueur():
     def construirebatiment(self,param):
         sorte,pos=param
         id=getprochainid()
-        self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte)
-        batiment=self.batiments[sorte][id]
+        
+        if self.costVerif(sorte):
+            self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte)
+            batiment=self.batiments[sorte][id]
         
         
-        self.parent.parent.afficherbatiment(self.nom,batiment)
-        self.parent.parent.vue.root.update()
-        litem=self.parent.parent.vue.canevas.find_withtag(id)
-        x1,y1,x2,y2=self.parent.parent.vue.canevas.bbox(litem)
-        cartebatiment=self.parent.getcartebbox(x1,y1,x2,y2)
-        for i in cartebatiment:
-            self.parent.cartecase[i[1]][i[0]]=9
-        batiment.cartebatiment=cartebatiment
+            self.parent.parent.afficherbatiment(self.nom,batiment)
+            self.parent.parent.vue.root.update()
+            litem=self.parent.parent.vue.canevas.find_withtag(id)
+            x1,y1,x2,y2=self.parent.parent.vue.canevas.bbox(litem)
+            cartebatiment=self.parent.getcartebbox(x1,y1,x2,y2)
+            for i in cartebatiment:
+                self.parent.cartecase[i[1]][i[0]]=9
+            batiment.cartebatiment=cartebatiment
 
 # CORRECTION REQUISE : la fonction devrait en faire la demande a l'ouvrier concerne 
 # trouvercible ne veut rien dire ici... à changer       
@@ -1157,19 +1169,64 @@ class Joueur():
 
         if self.ressourcemorte:
             self.sendListOfDeadStuff()
+            
+        if self.timerUnits:
+            if self.timerUnits.tick():
+                self.creerperso(self.unitParam)
+            
+            
                 
     def creerperso(self,param):
+        if self.unitParam:
+            sorteperso,batimentsource,idbatiment,pos=param
+            id=getprochainid()
+            batiment=self.batiments[batimentsource][idbatiment]
+
+            x=batiment.x+100+(random.randrange(50)-15)
+            y=batiment.y +(random.randrange(50)-15)
+        
+            #if sorteperso == "ouvrier":
+            self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
+            #else:    
+            #self.persos[sorteperso][id]=Joueur.classespersos[sorteperso](self,id,batiment,self.couleur,x,y,sorteperso)
+                
+            self.unitParam=None
+            self.timerUnits=None
+        else:
+            if self.costVerif("unit"):
+                self.unitParam=param
+                self.timerUnits=SimpleTimer(self, 5)
+            
+    def creerperso1(self,param):
         sorteperso,batimentsource,idbatiment,pos=param
         id=getprochainid()
         batiment=self.batiments[batimentsource][idbatiment]
         
-        x=batiment.x+100+(random.randrange(50)-15)
-        y=batiment.y +(random.randrange(50)-15)
+        #    self.timerUnits=SimpleTimer(self, 5)
+        if self.costVerif("unit"):
+
+            x=batiment.x+100+(random.randrange(50)-15)
+            y=batiment.y +(random.randrange(50)-15)
+        
+            #if sorteperso == "ouvrier":
+            self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
+            #else:    
+            #self.persos[sorteperso][id]=Joueur.classespersos[sorteperso](self,id,batiment,self.couleur,x,y,sorteperso)
             
-        #if sorteperso == "ouvrier":
-        self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
-        #else:    
-        #    self.persos[sorteperso][id]=Joueur.classespersos[sorteperso](self,id,batiment,self.couleur,x,y,sorteperso)
+    def costVerif(self, type):
+        enoughRess = True
+        
+        for k, ress in self.ressources.items():
+            for k2, cost in self.costs[type].items():
+                if k == k2 and ress < cost:
+                    enoughRess = False
+        
+        if enoughRess:
+            for k in self.ressources.keys():
+                for k2, cost in self.costs[type].items():
+                    if k == k2:
+                        self.ressources[k]-=cost
+        return enoughRess
 
 #######################  LE MODELE est la partie #######################
 class Partie():
