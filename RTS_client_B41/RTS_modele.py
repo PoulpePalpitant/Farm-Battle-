@@ -108,10 +108,14 @@ class Batiment():
         self.parent.addToListOfDeadStuff(False, self.montype, self.id) # S'ajoute à la liste des choses qui sont dead
         #self.parent.avertirressourcemort(self.typeressource,self.cibleressource)              
         
-        # Retire de la tile map
-        tile = self.parent.parent.trouvercase(self.x, self.y) 
-        if self in self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"]:    # safety measures
-                    self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"].remove(self)    
+        tile = self.parent.parent.findTileInHashMap(self.x, self.y) 
+        if self in tile["batiments"]:    # safety measures
+            tile["batiments"].remove(self)
+
+        # # Retire de la tile map
+        # tile = self.parent.parent.trouvercase(self.x, self.y) 
+        # if self in self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"]:    # safety measures
+        #             self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"].remove(self)    
 
         
 class Maison(Batiment):
@@ -564,9 +568,12 @@ class Perso():
         self.parent.addToListOfDeadStuff(True, self.type, self.id) # S'ajoute à la liste des choses qui sont dead
 
         # Retire de la tile map
-        tile = self.parent.parent.trouvercase(self.x, self.y) 
-        if self in self.parent.parent.hashmap[tile[0]][tile[1]]["persos"]:    # safety measures
-                    self.parent.parent.hashmap[tile[0]][tile[1]]["persos"].remove(self)    
+        tile = self.parent.parent.findTileInHashMap(self.x, self.y) 
+        if self in tile["persos"]:    # safety measures
+            tile["persos"].remove(self)
+        # if self in self.parent.parent.hashmap[tile[0]][tile[1]]["persos"]:    # safety measures
+        #     self.parent.parent.hashmap[tile[0]][tile[1]]["persos"].remove(self)    
+        #     print("done")
 
 
     def cibler(self,pos):
