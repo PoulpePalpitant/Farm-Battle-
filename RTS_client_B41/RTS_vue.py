@@ -50,7 +50,7 @@ class Vue():
         coul=self.modele.joueurs[self.parent.nomDuJoueur].couleur
         self.cadrejeuinfo.config(bg=coul[1])
         self.creeraide()
-        self.creercadreouvrier(coul[0]+"_",["maison","caserne","chickenCoop","pigPen"])
+        self.creercadreouvrier(coul[0]+"_",["maison","chickenCoop","pigPen"])
         self.creerchatter()
         # on affiche les maisons, point de depart des divers joueurs
         self.afficherdepart()
@@ -73,6 +73,7 @@ class Vue():
     
     def creercadreouvrier(self,coul,artefact):
         self.cadreouvrier=Frame(self.cadreaction)
+                
         for i in artefact:
             btn=Button(self.cadreouvrier,text=i,image=self.images[coul+i])
             btn.bind("<Button>",self.batirartefact)
@@ -441,9 +442,6 @@ class Vue():
             if "maison" in mestags:
                 pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
                 action=[self.parent.nomDuJoueur,"creerperso",["ouvrier",mestags[4],mestags[1],pos]]
-            if "caserne" in mestags:
-                pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
-                action=[self.parent.nomDuJoueur,"creerperso",["soldat",mestags[4],mestags[1],pos]]
             if "chickenCoop" in mestags:
                 pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
                 action=[self.parent.nomDuJoueur,"creerperso",["chicken",mestags[4],mestags[1],pos]]
