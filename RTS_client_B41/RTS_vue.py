@@ -15,6 +15,7 @@ class Vue():
         self.cadrechaton=0
         self.textchat=""
         self.infohud={}
+        self.changeSiloLoyalty = 0
         # sera charge apres l'initialisation de la partie, contient les donnees pour mettre l'interface a jour
         self.modele=None
         # variable pour suivre le trave du multiselect
@@ -50,6 +51,7 @@ class Vue():
         coul=self.modele.joueurs[self.parent.nomDuJoueur].couleur
         self.cadrejeuinfo.config(bg=coul[1])
         self.creeraide()
+        self.createCost()
         self.creercadreouvrier(coul[0]+"_",["maison","caserne","chickenCoop","pigPen"])
         self.creerchatter()
         # on affiche les maisons, point de depart des divers joueurs
@@ -73,6 +75,7 @@ class Vue():
     
     def creercadreouvrier(self,coul,artefact):
         self.cadreouvrier=Frame(self.cadreaction)
+                
         for i in artefact:
             btn=Button(self.cadreouvrier,text=i,image=self.images[coul+i])
             btn.bind("<Button>",self.batirartefact)
@@ -263,6 +266,17 @@ class Vue():
         fichieraide.close()
         self.textaide.insert(END, monaide)
         self.textaide.config(state=DISABLED)
+        
+    def createCost(self):
+        self.cadreCost=Frame(self.canevas)
+        self.scrollVCost=Scrollbar(self.cadreCost,orient=VERTICAL)
+        self.textCost=Text(self.cadreCost,width=20,height=10,
+                           yscrollcommand = self.scrollVCost.set)
+        self.scrollVCost.config(command = self.textCost.yview)
+        self.textCost.pack(side=LEFT)
+        self.scrollVCost.pack(side=LEFT,expand=1,fill=Y)
+        self.textCost.insert(END,"test")
+        self.textCost.config(state=DISABLED)
     
     def creerchatter(self):
         self.cadrechat=Frame(self.canevas,bd=2,bg="orange")
@@ -310,6 +324,8 @@ class Vue():
         self.canevas.tag_bind("roche","<Button-3>",self.ramasserressource)
         self.canevas.tag_bind("baie","<Button-3>",self.ramasserressource)
         self.canevas.tag_bind("daim","<Button-3>",self.chasserressource)
+        
+        self.canevas.tag_bind("silo","<Button-3>",self.indiquerposition)
     
     # cette méthode sert à changer le cadre (Frame) actif de la fenêtre, on n'a qu'à fournir le cadre requis
     def changercadre(self,nomcadre):
@@ -327,6 +343,7 @@ class Vue():
             self.canevasaction.delete(self.action.widgetsactifs)
             if self.action.btnactif:
                 self.action.btnactif.config(bg="SystemButtonFace")
+                self.action.showCost(0)
             self.action=Action(self)
 
     
@@ -388,7 +405,7 @@ class Vue():
                                     
     def indiquerposition(self,evt):
         tag=self.canevas.gettags(CURRENT)
-        if not tag:
+        if not tag or "silo" in tag:
             x,y=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
             self.action.position=[x,y]
             self.action.deplacer()
@@ -399,7 +416,7 @@ class Vue():
         if not tag:
             print(tag[3])
         else:
-            if self.nomDuJoueur != tag[0]:  # Si Ennemie
+            if self.nomDuJoueur != tag[0] and "silo" not in tag:  # Si Ennemie
                 self.action.setAttackTarget(tag)
             
     # Cette fonction permet se se deplacer via un click sur la minicarte
@@ -428,6 +445,18 @@ class Vue():
         self.action.prochaineaction=obj.cget("text")
         obj.config(bg="lightgreen")
         
+        artefactType=obj['text']
+        costs=self.modele.joueurs[self.nomDuJoueur].costs
+        
+        self.textCost.config(state=NORMAL)
+        self.textCost.delete('1.0', END)
+        self.textCost.insert(END, "nourriture:"+str(costs[artefactType]["nourriture"]))
+        self.textCost.insert(END, "\narbre:"+str(costs[artefactType]["arbre"]))
+        self.textCost.insert(END, "\nroche:"+str(costs[artefactType]["roche"]))
+        self.textCost.insert(END, "\naureus:"+str(costs[artefactType]["aureus"]))
+        self.textCost.config(state=DISABLED)
+        self.action.showCost(1)
+        
     def construirebatiment(self,evt):
         mestags=self.canevas.gettags(CURRENT)
         if not mestags:
@@ -441,9 +470,6 @@ class Vue():
             if "maison" in mestags:
                 pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
                 action=[self.parent.nomDuJoueur,"creerperso",["ouvrier",mestags[4],mestags[1],pos]]
-            if "caserne" in mestags:
-                pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
-                action=[self.parent.nomDuJoueur,"creerperso",["soldat",mestags[4],mestags[1],pos]]
             if "chickenCoop" in mestags:
                 pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
                 action=[self.parent.nomDuJoueur,"creerperso",["chicken",mestags[4],mestags[1],pos]]
@@ -493,6 +519,14 @@ class Vue():
                 x1=int((m.x/self.modele.aireX)*self.tailleminicarte)
                 y1=int((m.y/self.modele.aireY)*self.tailleminicarte)
                 self.minicarte.create_rectangle(x1-2,y1-2,x1+2,y1+2,fill=coul,tags=(j,m.id,"artefact","maison"))
+                
+        silo = self.modele.silo
+        #afficher vision silo
+        #self.canevas.create_oval(silo.x-silo.vision, silo.y-silo.vision, silo.x+silo.vision, silo.y+silo.vision, outline="MediumPurple4", width=2)
+        self.canevas.create_image(silo.x,silo.y,image=self.images[silo.image],tags=(silo.id,"batiment","silo"))
+        x1=int((silo.x/self.modele.aireX)*self.tailleminicarte)
+        y1=int((silo.y/self.modele.aireY)*self.tailleminicarte)
+        self.minicarte.create_rectangle(x1-2,y1-2,x1+2,y1+2,fill="MediumPurple4",tags=(silo.id,"silo"))
     
     def afficherbio(self,bio):
         self.canevas.create_image(bio.x,bio.y,image=self.images[bio.img],
@@ -586,6 +620,14 @@ class Vue():
             if self.modele.joueurs[self.parent.nomDuJoueur].chatneuf and self.action.chaton==0:
                 self.btnchat.config(bg="orange")
             self.modele.joueurs[self.parent.nomDuJoueur].chatneuf=0
+            
+        if self.changeSiloLoyalty:
+            self.canevas.delete("silo")
+            
+            silo = self.modele.silo
+            self.canevas.create_image(silo.x,silo.y,image=self.images[silo.image],tags=(silo.id,"artefact","batiment","silo"))
+            self.changeSiloLoyalty = 0
+            
                 
     ###  METHODES POUR SPLASH ET LOBBY INSCRIPTION pour participer a une partie
     def updatesplash(self,etat):
@@ -643,6 +685,7 @@ class Action():
         self.widgetsactifs=[]
         self.chaton=0 
         self.aideon=0 
+        self.costOn=0
            
 
     # C'est ici qu'on liste tout les actions possibles?
@@ -673,7 +716,8 @@ class Action():
         self.btnactif.config(bg="SystemButtonFace")
         self.btnactif=None
         action=[self.parent.nomDuJoueur,"construirebatiment",[self.prochaineaction,pos]]
-        self.parent.parent.actionsrequises=action            
+        self.parent.parent.actionsrequises=action        
+        self.showCost(0)
                 
     def affichercommandeperso(self):
         self.widgetsactifs=self.parent.canevasaction.create_window(100,180,
@@ -715,6 +759,18 @@ class Action():
         else:
             self.parent.canevas.delete(self.aideon)
             self.aideon=0
+            
+    def showCost(self, on):
+        if on==1:
+            x1,x2=self.parent.scrollH.get()
+            x3=self.parent.modele.aireX*x2
+            y1,y2=self.parent.scrollV.get()
+            y3=self.parent.modele.aireY*y2
+            self.costOn=self.parent.canevas.create_window(x3,y3,
+                                                window=self.parent.cadreCost,
+                                                anchor=S+E)
+        else:
+            self.parent.canevas.delete(self.costOn)
             
         
 class Champ(Label):
