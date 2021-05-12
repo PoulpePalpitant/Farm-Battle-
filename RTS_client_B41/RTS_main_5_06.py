@@ -8,6 +8,7 @@ from helper import Helper
 from RTS_divers import *
 from RTS_vue import *
 from RTS_modele import *
+from RTS_upgrades import *
 
 """
 Application client RTS, base sur le modele approximatif d'Age of Empire I
@@ -28,11 +29,12 @@ class Controleur():
         # cette variable INDENTIFIE les joueurs dans le jeu IMPORTANT            
         # createur automatique d'un nom de joueur, pour faciliter les tests (pas besoin d'inscrire un chaque fois)
         # NOTE la fonction ne garantie pas l'unicite des noms - probleme en cas de conflit - non traite pour l'instant
-        self.monnom=self.generernom()     
+        self.nomDuJoueur=self.generernom()     
         # la variable donnant acces au jeu pour le controleur, cree lorsque la partie est initialise (initialiserpartie)
         self.modele=None
         # liste des noms de joueurs pour le lobby
         self.joueurs=[]
+        
         # requis pour sortir de cette boucle et passer au lobby du jeu
         self.prochainsplash=None    
                 
@@ -48,7 +50,7 @@ class Controleur():
         # test la connexion au serveur et retourne son etat pour l'afficher dans le splash
         testdispo=self.testetatserveur()
         # creation de la l'objet vue pour l'affichage et les controles du jeu
-        self.vue=Vue(self,self.urlserveur,self.monnom,testdispo[0])
+        self.vue=Vue(self,self.urlserveur,self.nomDuJoueur,testdispo[0])
         # requiert l'affichage initiale du splash screen (fenetre initiale de l'application)
         self.vue.changercadre("splash") 
         # lancement de la communication avec les serveur
@@ -92,9 +94,9 @@ class Controleur():
             self.vue.root.after_cancel(self.prochainsplash)
             self.prochainsplash=None
         if nom:
-            self.monnom=nom
+            self.nomDuJoueur=nom
         url = self.urlserveur+"/creerpartie"
-        params = {"nom": self.monnom,
+        params = {"nom": self.nomDuJoueur,
                   "valoptions":[valciv]}
         reptext=self.appelserveur(url,params)
         mondict=reptext.decode('utf-8')
@@ -102,7 +104,7 @@ class Controleur():
         maciv=ast.literal_eval(mondict)
         macivint=ast.literal_eval(maciv[1])
         self.egoserveur=1
-        self.vue.root.title("je suis "+self.monnom)
+        self.vue.root.title("je suis "+self.nomDuJoueur)
         self.vue.changercadre("lobby")
         self.bouclersurlobby()
             
@@ -114,14 +116,14 @@ class Controleur():
             self.vue.root.after_cancel(self.prochainsplash)
             self.prochainsplash=None
         if nom:
-            self.monnom=nom
+            self.nomDuJoueur=nom
         url = self.urlserveur+"/inscrirejoueur"
-        params = {"nom": self.monnom,
+        params = {"nom": self.nomDuJoueur,
                   "valoptions":[valciv] }
         reptext=self.appelserveur(url,params)
         
         mondict=json.loads(reptext)
-        self.vue.root.title("je suis "+self.monnom)
+        self.vue.root.title("je suis "+self.nomDuJoueur)
         self.vue.changercadre("lobby")
         self.bouclersurlobby()
     
@@ -130,10 +132,14 @@ class Controleur():
     # lors que le createur voit tous ses joueurs esperes insrit il peut (seul d'ailleurs) lancer la partie
     # cette methode ne fait que changer l'etat de la partie sur le serveur pour le mettre a courant
     # lorsque chaque joueur recevra cet etat la partie sera initialiser et demarrer localement pour chacun
-    def lancerpartie(self,nbrIA=0):
+    def lancerpartie(self,nbrIA = 0):
+        
+        if DebugSettings.generateAi:    # debug settings debug settingsdebug settingsdebug settingsdebug settingsdebug settingsdebug settingsdebug settingsdebug settings
+            nbrIA = 3
+
         ## au lancement le champ 'champnbtIA' du lobby est lu...
         url = self.urlserveur+"/lancerpartie"
-        params = {"nom": self.monnom,
+        params = {"nom": self.nomDuJoueur,
                   "nbrIA":nbrIA}
         reptext=self.appelserveur(url,params)
         
@@ -173,7 +179,7 @@ class Controleur():
     # boucle de comunication intiale avec le serveur pour creer ou s'inscrire a la partie
     def bouclersplash(self):
         url = self.urlserveur+"/testjeu"
-        params = {"nom": self.monnom }
+        params = {"nom": self.nomDuJoueur }
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)
         if "attente" in mondict[0]:
@@ -183,7 +189,7 @@ class Controleur():
     # on boucle sur le lobby en attendant l'inscription de tous les joueurs attendus
     def bouclersurlobby(self):
         url = self.urlserveur+"/lobbyjoueur"
-        params = {"nom": self.monnom }
+        params = {"nom": self.nomDuJoueur }
         reptext=self.appelserveur(url,params)
         mondict=json.loads(reptext)
         # si l'etat est courant, c'est que la partie vient d'etre lancer
@@ -204,8 +210,9 @@ class Controleur():
             else:
                 actions=None
             self.actionsrequises=[]
+            
             url = self.urlserveur+"/bouclersurjeu"
-            params = {"nom": self.monnom,
+            params = {"nom": self.nomDuJoueur,
                       "cadrejeu":self.cadrejeu,
                       "actionsrequises":actions}
             
@@ -221,6 +228,7 @@ class Controleur():
     
     # generateur de nouveau nom, 
     # peut generer UN NOM EXISTANT mais c'est rare, NON GERER PAR LE SERVEUR        
+    
     def generernom(self): 
         monnom="JM_"+str(random.randrange(100,1000))
         return monnom
