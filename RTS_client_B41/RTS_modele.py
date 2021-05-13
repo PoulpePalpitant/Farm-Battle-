@@ -1034,15 +1034,10 @@ class Joueur():
         self.y=y
         self.popMaxDuBatiment={"maison":1,
                        "abri":1,
-                       "caserne":0,
                        "chickenCoop":0,
                        "pigPen":0}
 
         self.popActuel={"ouvrier":0,
-                   "soldat":0,
-                   "archer":0,
-                   "chevalier":0,
-                   "druide":0,
                    "chicken":0,
                    "pig":0}
         self.couleur=couleur
@@ -1188,7 +1183,7 @@ class Joueur():
         id=getprochainid()
         
         if self.costVerif(sorte):
-            self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte)
+            self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte,self.prototypeBatiments[sorte] )
             batiment=self.batiments[sorte][id]
             self.parent.parent.afficherbatiment(self.nom,batiment)
             self.parent.parent.vue.root.update()
@@ -1230,11 +1225,7 @@ class Joueur():
 
             x=batiment.x+100+(random.randrange(50)-15)
             y=batiment.y +(random.randrange(50)-15)
-        
-            #if sorteperso == "ouvrier":
             self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
-            #else:    
-            #self.persos[sorteperso][id]=Joueur.classespersos[sorteperso](self,id,batiment,self.couleur,x,y,sorteperso)
                 
             self.unitParam=None
             self.timerUnits=None
@@ -1242,25 +1233,6 @@ class Joueur():
             if self.costVerif("unit"):
                 self.unitParam=param
                 self.timerUnits=SimpleTimer(self, 5)
-            
-    def creerperso1(self,param):
-        sorteperso,batimentsource,idbatiment,pos=param
-        id=getprochainid()
-        batiment=self.batiments[batimentsource][idbatiment]
-        
-        #    self.timerUnits=SimpleTimer(self, 5)
-        if self.costVerif("unit"):
-
-            x=batiment.x+100+(random.randrange(50)-15)
-            y=batiment.y +(random.randrange(50)-15)
-        
-            #if sorteperso == "ouvrier":
-            if self.popActuel[sorteperso] < self.popMaxDuBatiment[batimentsource]:
-                self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
-                self.popActuel[sorteperso] += 1
-            else:
-                print("OH NON!")   
-            #self.persos[sorteperso][id]=Joueur.classespersos[sorteperso](self,id,batiment,self.couleur,x,y,sorteperso)
             
     def costVerif(self, type):
         enoughRess = True
