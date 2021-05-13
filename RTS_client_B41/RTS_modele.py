@@ -13,11 +13,7 @@ class DebugSettings(): # Va permettre de dbug bien des affaires
     showAttackRange = True      # Indicateur du range d'attack des unités
     
     # Settings de lancement de partie
-<<<<<<< HEAD
-    spawnPlayersNearby = True   # Spawn tout les joueurs très proche
-=======
     spawnPlayersNearby = False   # Spawn tout les joueurs très proche
->>>>>>> d11c257b201b3b34d819c963665e21c24579d9e4
     generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
     createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
     quickStart = True           # Reset create et launch une partie, immédiatement
@@ -1003,9 +999,6 @@ class Joueur():
         self.nom=nom
         self.id=id
         self.x=x 
-<<<<<<< HEAD
-        self.y=y 
-=======
         self.y=y
         self.popMaxDuBatiment={"maison":1,
                        "abri":1,
@@ -1015,7 +1008,6 @@ class Joueur():
         self.popActuel={"ouvrier":0,
                    "chicken":0,
                    "pig":0}
->>>>>>> d11c257b201b3b34d819c963665e21c24579d9e4
         self.couleur=couleur
         self.monchat=[]
         self.chatneuf=0
@@ -1164,11 +1156,7 @@ class Joueur():
         sorte,pos=param
         id=getprochainid()
         if self.costVerif(sorte):
-<<<<<<< HEAD
-            self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte, self.prototypeBatiments[sorte])
-=======
-            self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte,self.prototypeBatiments[sorte] )
->>>>>>> d11c257b201b3b34d819c963665e21c24579d9e4
+            self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte,self.prototypeBatiments[sorte])
             batiment=self.batiments[sorte][id]
         
         
@@ -1198,37 +1186,26 @@ class Joueur():
             self.sendListOfDeadStuff()
                 
     def creerperso(self,param):
-<<<<<<< HEAD
         sorteperso,batimentsource,idbatiment,pos=param
-        id=getprochainid()
         batiment=self.batiments[batimentsource][idbatiment]
-        
-        #    self.timerUnits=SimpleTimer(self, 5)
-        if self.costVerif("unit"):
-            if self.popActuel[sorteperso] < self.popMaxDuBatiment[batimentsource]:    
-                x=batiment.x+100+(random.randrange(50)-15)
-                y=batiment.y +(random.randrange(50)-15)                            
-                self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
-                self.popActuel[sorteperso] += 1                            
-            else:
-                print("OH NON!")
-=======
-        if self.unitParam:
-            sorteperso,batimentsource,idbatiment,pos=param
-            id=getprochainid()
-            batiment=self.batiments[batimentsource][idbatiment]
 
+        if self.unitParam:
+            id=getprochainid()
             x=batiment.x+100+(random.randrange(50)-15)
             y=batiment.y +(random.randrange(50)-15)
             self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
-                
             self.unitParam=None
             self.timerUnits=None
         else:
             if self.costVerif("unit"):
-                self.unitParam=param
-                self.timerUnits=SimpleTimer(self, 5)
-            
+                if self.popActuel[sorteperso] < self.popMaxDuBatiment[batimentsource]:    
+                    self.popActuel[sorteperso] += 1                            
+                    self.unitParam=param
+                    self.timerUnits=SimpleTimer(self, 5)
+                else:
+                    print("OH NON!")
+
+ 
     def costVerif(self, type):
         enoughRess = True
         
@@ -1243,7 +1220,7 @@ class Joueur():
                     if k == k2:
                         self.ressources[k]-=cost
         return enoughRess
->>>>>>> d11c257b201b3b34d819c963665e21c24579d9e4
+
 
 #######################  LE MODELE est la partie #######################
 class Partie():
