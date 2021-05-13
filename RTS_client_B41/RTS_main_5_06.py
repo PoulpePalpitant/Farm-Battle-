@@ -231,8 +231,8 @@ class Controleur():
     # peut generer UN NOM EXISTANT mais c'est rare, NON GERER PAR LE SERVEUR        
     
     def generernom(self): 
-        nomDuJoueur="JAJA_"+str(random.randrange(100,1000))
-        return nomDuJoueur
+        monnom="JM_"+str(random.randrange(100,1000))
+        return monnom
     
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
     def appelserveur(self,url,params):
@@ -250,6 +250,9 @@ class Controleur():
         
     def afficherbio(self,bio):
         self.vue.afficherbio(bio)
+    
+    def ajustSiloLoyalty(self):
+        self.vue.changeSiloLoyalty = 1
 
 if __name__ == '__main__':
     c=Controleur()
