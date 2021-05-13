@@ -50,12 +50,8 @@ class Vue():
         coul=self.modele.joueurs[self.parent.nomDuJoueur].couleur
         self.cadrejeuinfo.config(bg=coul[1])
         self.creeraide()
-<<<<<<< HEAD
         self.createCost()
         self.creercadreouvrier(coul[0]+"_",["maison","chickenCoop","pigPen"])
-=======
-        self.creercadreouvrier(coul[0]+"_",["maison","caserne","chickenCoop","pigPen"])
->>>>>>> ed2598673dfaa82845736a77fb8e8425ecc94a8d
         self.creerchatter()
         # on affiche les maisons, point de depart des divers joueurs
         self.afficherdepart()
