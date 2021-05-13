@@ -148,7 +148,8 @@ def chargerimages():
             'B_silo':PhotoImage(file='./images/xxxbatiment/B_silo.png'),
             'J_silo':PhotoImage(file='./images/xxxbatiment/J_silo.png'),
             'R_silo':PhotoImage(file='./images/xxxbatiment/R_silo.png'),
-            'V_silo':PhotoImage(file='./images/xxxbatiment/V_silo.png')}
+            'V_silo':PhotoImage(file='./images/xxxbatiment/V_silo.png')
+            }
     return images
 
 
