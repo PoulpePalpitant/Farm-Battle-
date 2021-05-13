@@ -264,6 +264,17 @@ class Vue():
         fichieraide.close()
         self.textaide.insert(END, monaide)
         self.textaide.config(state=DISABLED)
+
+    def createCost(self):
+        self.cadreCost=Frame(self.canevas)
+        self.scrollVCost=Scrollbar(self.cadreCost,orient=VERTICAL)
+        self.textCost=Text(self.cadreCost,width=20,height=10,
+                           yscrollcommand = self.scrollVCost.set)
+        self.scrollVCost.config(command = self.textCost.yview)
+        self.textCost.pack(side=LEFT)
+        self.scrollVCost.pack(side=LEFT,expand=1,fill=Y)
+        self.textCost.insert(END,"test")
+        self.textCost.config(state=DISABLED)
     
     def creerchatter(self):
         self.cadrechat=Frame(self.canevas,bd=2,bg="orange")
