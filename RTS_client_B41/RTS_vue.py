@@ -50,12 +50,8 @@ class Vue():
         coul=self.modele.joueurs[self.parent.nomDuJoueur].couleur
         self.cadrejeuinfo.config(bg=coul[1])
         self.creeraide()
-<<<<<<< HEAD
         self.createCost()
         self.creercadreouvrier(coul[0]+"_",["maison","chickenCoop","pigPen"])
-=======
-        self.creercadreouvrier(coul[0]+"_",["maison","caserne","chickenCoop","pigPen"])
->>>>>>> parent of 330aeed (Merge branch 'dev' into Marcos)
         self.creerchatter()
         # on affiche les maisons, point de depart des divers joueurs
         self.afficherdepart()
@@ -268,7 +264,6 @@ class Vue():
         fichieraide.close()
         self.textaide.insert(END, monaide)
         self.textaide.config(state=DISABLED)
-<<<<<<< HEAD
 
     def createCost(self):
         self.cadreCost=Frame(self.canevas)
@@ -280,8 +275,6 @@ class Vue():
         self.scrollVCost.pack(side=LEFT,expand=1,fill=Y)
         self.textCost.insert(END,"test")
         self.textCost.config(state=DISABLED)
-=======
->>>>>>> parent of 330aeed (Merge branch 'dev' into Marcos)
     
     def creerchatter(self):
         self.cadrechat=Frame(self.canevas,bd=2,bg="orange")
