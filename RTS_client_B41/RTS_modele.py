@@ -65,61 +65,6 @@ class SimpleTimer():
 
 
 
-class DebugSettings(): # Va permettre de dbug bien des affaires
-    debugMode = True            
-    showAttackRange = True      # Indicateur du range d'attack des unités
-    
-    # Settings de lancement de partie
-    spawnPlayersNearby = True   # Spawn tout les joueurs très proche
-    generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
-    createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
-    quickStart = True           # Reset create et launch une partie, immédiatement
-
-class ARMOR_TYPES():
-    LIGHT = 'LIGHT'
-    MEDIUM= 'MEDIUM'
-    HEAVY = 'MEDIUM'
-    SUPRA_HARD = 'SUPRA_HARD'
-
-class SimpleTimer():
-    def __init__(self, parent, interval):
-        self.parent = parent
-        self.interval = interval
-        self.counter = 0
-        self.running = True
-    # Une alternative serait de juste setté un point future, et de checker si on est rendu
-    # AddDelay(time + duration)
-    # tick -> if time >= pointfuture: 
-    #             timer est finit
-
-    def set(self, interval):
-        try :
-            if interval > 0:  # Pas de counter négatif
-                self.counter = 0
-                self.interval = interval
-                self.running = True
-        except ValueError :
-                print("Timer null ou négatif is no bueno")
-    
-    def isRunning(self): 
-        return self.running 
-
-    def tick(self):
-        self.counter += 1 
-
-        if self.counter >= self.interval: 
-            self.running = False
-            return True # Counter finis
-        else:
-            return False
-
-    def start(self):  
-        self.counter = 0
-        self.running = True
-
-    def stop(self): 
-        self.counter = self.interval = 0
-
 class Batiment():
     def __init__(self,parent,id, couleur,x,y,montype, cloningPrototype = True):
         if cloningPrototype:
@@ -252,7 +197,7 @@ class ChickenCoop(Batiment):
         return ChickenCoop(parent,id,couleur,x,y,montype, prototype)
 
 class PigPen(Batiment):
-    def __init__(self,parent,id,couleur,x,y, montype, prototype = None):
+    def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
         Batiment.__init__(self,parent,id, couleur,x, y, montype, prototype)
         
         if prototype:
@@ -260,8 +205,10 @@ class PigPen(Batiment):
 
         else:
             # Stats de defenses 
-            self.health    = self.maxHealth = 500
-            self.defense   = 2
+            self.health = self.maxHealth = 500
+            self.defense = 2
+            self.maxperso=20
+            self.perso=0
 
     def copyAttributes(self, prototype):
         super().copyAttributes(prototype)
@@ -269,11 +216,6 @@ class PigPen(Batiment):
     def clone(parent,id,couleur,x,y,montype, prototype):       
         return PigPen(parent,id,couleur,x,y,montype, prototype)
         
-        # Stats de defenses 
-        self.health = 300
-        self.defense = 2
-        self.armor = ARMOR_TYPES.HEAVY
-
 class Daim():
     def __init__(self,parent,id,x,y):
         self.parent=parent
@@ -616,6 +558,7 @@ class Perso():
         else:
             self.resetAction()
 
+        
     
     def dealDamage(self, target):
         # Check si ya boost de dmg selon le type d'armor et de dmg
@@ -669,7 +612,7 @@ class Perso():
         
         for t in tilesAround:
             for p in t["persos"]: # Ajout de tout les unités ennemies
-                if p.parent != self.parent: # Si ennemie !   
+                if p.parent != self.parent: # Si ennemie !  
                     ennemyUnits.append(p)
             for b in t["batiments"]:  # Ajout de tout les batiments ennemis
                 if b.parent != self.parent: # Si ennemie !   
@@ -784,6 +727,7 @@ class Pig(Perso):
     def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
         Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
         
+        
         if prototype:
             self.copyAttributes(prototype)
         else:
@@ -793,6 +737,7 @@ class Pig(Perso):
             self.armorType = ARMOR_TYPES.HEAVY
             self.atkDmg = 30
             self.atkSpeed = 2
+
 
     def copyAttributes(self, prototype):
         super().copyAttributes(prototype)
@@ -974,7 +919,7 @@ class Ouvrier(Perso):
                         self.parent.ressources["nourriture"]+=self.ramassage
                     else:
                         self.parent.ressources[self.typeressource]+=self.ramassage
-                        self.ramassage=0
+                    self.ramassage=0
                     if self.cibleressource:
                         self.cibler([self.cibleressource.x,self.cibleressource.y])
                         self.actioncourante="ciblerressource"
@@ -1054,24 +999,14 @@ class Joueur():
         self.nom=nom
         self.id=id
         self.x=x 
-        self.y=y
-        self.popMaxDuBatiment={"maison":1,
-                       "abri":1,
-                       "caserne":0,
-                       "chickenCoop":0,
-                       "pigPen":0}
-
-        self.popActuel={"ouvrier":0,
-                   "soldat":0,
-                   "archer":0,
-                   "chevalier":0,
-                   "druide":0,
-                   "chicken":0,
-                   "pig":0}
+        self.y=y 
         self.couleur=couleur
         self.monchat=[]
         self.chatneuf=0
-
+        self.timerUnits=None
+        self.timerHouses=None #SimpleTimer(self, 15)
+        self.unitParam=None
+        self.houseParam=None
         self.ressourcemorte=[]#
         self.ressources={"nourriture":200,
                          "arbre":200,
@@ -1116,6 +1051,7 @@ class Joueur():
                       "chatter":self.chatter,
                       "setAttackTarget":self.setAttackTarget,
                       }
+
         # on va creer une maison comme centre pour le joueur
         self.creerpointdorigine(x,y)
         self.completedUpgrades = {}     # ex : {"Protein shakes": ProteinShake}
@@ -1205,23 +1141,27 @@ class Joueur():
             self.batiments["chickenCoop"][nextId]= ChickenCoop(self,nextId ,self.couleur, x + 25 , y - 100,"chickenCoop")    # Peut crash si spawn trop près d'une bordure, probablement
             self.creerperso(["chicken","chickenCoop",nextId,[]])
 
+            
+        
+    
     def construirebatiment(self,param):
         sorte,pos=param
         id=getprochainid()
+        if self.costVerif(sorte):
+            self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte, self.prototypeBatiments[sorte])
+            batiment=self.batiments[sorte][id]
         
-        self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte, self.prototypeBatiments[sorte])
-        # self.batiments[sorte][id]=self.parent.classesbatiments[sorte](self,id,self.couleur,pos[0],pos[1],sorte)
-        batiment=self.batiments[sorte][id]
         
-        self.parent.parent.afficherbatiment(self.nom,batiment)
-        self.parent.parent.vue.root.update()
-        litem=self.parent.parent.vue.canevas.find_withtag(id)
-        x1,y1,x2,y2=self.parent.parent.vue.canevas.bbox(litem)
-        cartebatiment=self.parent.getcartebbox(x1,y1,x2,y2)
-        for i in cartebatiment:
-            self.parent.cartecase[i[1]][i[0]]=9
-        batiment.cartebatiment=cartebatiment
-        self.popMaxDuBatiment[sorte] += 5
+            self.parent.parent.afficherbatiment(self.nom,batiment)
+            self.parent.parent.vue.root.update()
+            litem=self.parent.parent.vue.canevas.find_withtag(id)
+            x1,y1,x2,y2=self.parent.parent.vue.canevas.bbox(litem)
+            cartebatiment=self.parent.getcartebbox(x1,y1,x2,y2)
+            for i in cartebatiment:
+                self.parent.cartecase[i[1]][i[0]]=9
+            batiment.cartebatiment=cartebatiment
+            self.popMaxDuBatiment[sorte] += 5
+
 # CORRECTION REQUISE : la fonction devrait en faire la demande a l'ouvrier concerne 
 # trouvercible ne veut rien dire ici... à changer       
     def ouvrierciblermaison(self,listparam):
@@ -1242,17 +1182,15 @@ class Joueur():
         id=getprochainid()
         batiment=self.batiments[batimentsource][idbatiment]
         
-        x=batiment.x +100+(random.randrange(50)-15)
-        y=batiment.y +(random.randrange(50)-15)
-            
-        #if sorteperso == "ouvrier":
-        if self.popActuel[sorteperso] < self.popMaxDuBatiment[batimentsource]:
-            self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
-            self.popActuel[sorteperso] += 1
-        else:
-            print("OH NON!")
-        #else:    
-        #    self.persos[sorteperso][id]=Joueur.classespersos[sorteperso](self,id,batiment,self.couleur,x,y,sorteperso)
+        #    self.timerUnits=SimpleTimer(self, 5)
+        if self.costVerif("unit"):
+            if self.popActuel[sorteperso] < self.popMaxDuBatiment[batimentsource]:    
+                x=batiment.x+100+(random.randrange(50)-15)
+                y=batiment.y +(random.randrange(50)-15)                            
+                self.persos[sorteperso][id]=Joueur.classespersos[sorteperso].clone(self,id,batiment,self.couleur,x,y,sorteperso, self.prototypePersos[sorteperso])
+                self.popActuel[sorteperso] += 1                            
+            else:
+                print("OH NON!")
 
 #######################  LE MODELE est la partie #######################
 class Partie():
@@ -1661,7 +1599,7 @@ class Partie():
                 case=self.carte[i][j]
                 pxcentrecasex=(j*self.taillecase)+self.demicase
                 pxcentrecasey=(i*self.taillecase)+self.demicase
-                distcase=Helper.calcDistance(pxcentrex,pxcentrey,pxcentrecasex,pxcentrecasey)
+                distcase=H.calcDistance(pxcentrex,pxcentrey,pxcentrecasex,pxcentrecasey)
                 if distcase<=distmax:
                     t1.append(case)
         return t1  

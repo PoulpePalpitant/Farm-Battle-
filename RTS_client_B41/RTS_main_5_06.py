@@ -231,8 +231,8 @@ class Controleur():
     # peut generer UN NOM EXISTANT mais c'est rare, NON GERER PAR LE SERVEUR        
     
     def generernom(self): 
-        monnom="JM_"+str(random.randrange(100,1000))
-        return monnom
+        nomDuJoueur="JAJA_"+str(random.randrange(100,1000))
+        return nomDuJoueur
     
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
     def appelserveur(self,url,params):
