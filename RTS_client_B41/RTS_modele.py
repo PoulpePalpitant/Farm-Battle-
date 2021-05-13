@@ -66,38 +66,27 @@ class SimpleTimer():
 
 
 class Batiment():
-    def __init__(self,parent,id, couleur,x,y,montype, cloningPrototype = True):
-        if cloningPrototype:
-            self.parent=parent
-            self.id=id
-            self.x=x
-            self.y=y
+    def __init__(self,parent,id,x,y):
+        self.parent=parent
+        self.id=id
+        self.x=x
+        self.y=y
 
-            # S'ajoute sur la map
-            casex2,casey2 = self.parent.parent.trouvercase(x, y)           
-            self.parent.parent.hashmap[casex2][casey2]["batiments"].append(self)    
+        # S'ajoute sur la map
+        casex2,casey2 = self.parent.parent.trouvercase(x, y)           
+        self.parent.parent.hashmap[casex2][casey2]["batiments"].append(self)    
 
-            self.montype=montype
-            self.image=couleur[0]+"_"+montype
+        self.image=None
+        self.montype=None
+        self.cartebatiment=[]
 
-            self.cartebatiment=[]
-            self.alive = True
-        else:
-            # Le prototype de base va avoir ces stats. Tout les clones vont copier les attributs du prototype de bases
-            self.health = self.maxHealth = 0
-            self.defense = 2
-            self.maxperso = 0
-            self.perso = 0
-            self.armorType = ARMOR_TYPES.HEAVY
-
-    def copyAttributes(self, prototype):  
-        self.health = prototype.health
-        self.maxHealth = prototype.health
-        self.defense = prototype.defense
-        self.armorType = prototype.armorType
-        self.maxperso = prototype.maxperso
-        self.perso = prototype.perso
-
+        # Stats de defenses des bâtiments, doivent être spécifié dans les sous-classes
+        self.alive = True
+        self.health = 0
+        self.defense = 2
+        self.maxperso=0
+        self.perso=0
+        self.armorType = ARMOR_TYPES.HEAVY
 
     def clone():     # Abstract
         return
@@ -108,14 +97,10 @@ class Batiment():
         self.parent.addToListOfDeadStuff(False, self.montype, self.id) # S'ajoute à la liste des choses qui sont dead
         #self.parent.avertirressourcemort(self.typeressource,self.cibleressource)              
         
-        tile = self.parent.parent.findTileInHashMap(self.x, self.y) 
-        if self in tile["batiments"]:    # safety measures
-            tile["batiments"].remove(self)
-
-        # # Retire de la tile map
-        # tile = self.parent.parent.trouvercase(self.x, self.y) 
-        # if self in self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"]:    # safety measures
-        #             self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"].remove(self)    
+        # Retire de la tile map
+        tile = self.parent.parent.trouvercase(self.x, self.y) 
+        if self in self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"]:    # safety measures
+                    self.parent.parent.hashmap[tile[0]][tile[1]]["batiments"].remove(self)    
 
 class Silo():
     def __init__(self,parent,id,x,y,type):
@@ -172,86 +157,58 @@ class Silo():
                 self.timer.start()
         
 class Maison(Batiment):
-    def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
-        Batiment.__init__(self,parent,id, couleur,x, y, montype, prototype)
+    def __init__(self,parent,id,couleur,x,y,montype):
+        Batiment.__init__(self,parent,id,x,y)
+        self.image=couleur[0]+"_"+montype
+        self.montype=montype
+        self.maxperso=10
+        self.perso=0
 
-        if prototype:
-            self.copyAttributes(prototype)
-        else:
-            # Stats de defenses 
-            self.health = self.maxHealth = 300
-            self.defense = 2
-            self.maxperso=10    # useless for now
-            self.perso=0        # useless for now
+        # Stats de defenses 
+        self.health = 300
+        self.defense = 2
 
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,couleur,x,y,montype, prototype):       
-        return Maison(parent,id,couleur,x,y,montype, prototype)
-
-
-class Abri(Batiment):
-    def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
-        Batiment.__init__(self,parent,id, couleur, x, y, montype, prototype)
-
-        if prototype:
-            self.copyAttributes(prototype)
-        else:
-            # Stats de defenses 
-            self.health = self.maxHealth = 300
-            self.defense = 2
-            self.maxperso=20
-            self.perso=0
-
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,couleur,x,y,montype, prototype):       
-        return Abri(parent,id,couleur,x,y,montype, prototype)
-
-class ChickenCoop(Batiment):
-    def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
-        Batiment.__init__(self,parent,id, couleur,x, y, montype, prototype)
-
-        if prototype:
-            self.copyAttributes(prototype)
-
-            self.maxperso=20
-            self.perso=0
-        else:
-            # Stats de defenses 
-            self.health = self.maxHealth = 500
-            self.defense = 2
-
-    def copyAttributes(self, prototype):
-        print(super())
-        print(super)
-
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,couleur,x,y,montype, prototype):       
-        return ChickenCoop(parent,id,couleur,x,y,montype, prototype)
-
-class PigPen(Batiment):
-    def __init__(self,parent,id,couleur,x,y,montype, prototype = None):
-        Batiment.__init__(self,parent,id, couleur,x, y, montype, prototype)
+class Abri():
+    def __init__(self,parent,id,couleur,x,y,montype):
+        Batiment.__init__(self,parent,id,x,y)
+        self.image=couleur[0]+"_"+montype
+        self.montype=montype
+        self.maxperso=20
+        self.perso=0
         
-        if prototype:
-            self.copyAttributes(prototype)
+        # Stats de defenses 
+        self.health = 300
+        self.defense = 2
+        
+class Caserne():
+    def __init__(self,parent,id,couleur,x,y,montype):
+        Batiment.__init__(self,parent,id,x,y)
+        self.image=couleur[0]+"_"+montype
+        self.montype=montype
+        self.maxperso=20
+        self.perso=0
 
-        else:
-            # Stats de defenses 
-            self.health = self.maxHealth = 500
-            self.defense = 2
-            self.maxperso=20
-            self.perso=0
+class ChickenCoop():
+    def __init__(self,parent,id,couleur,x,y,montype):
+        Batiment.__init__(self,parent,id,x,y)
+        self.image=couleur[0]+"_"+montype
+        self.montype=montype
+        self.maxperso=20
+        self.perso=0
+        # Stats de defenses 
+        self.health = 500
+        self.defense = 2
 
-    def copyAttributes(self, prototype):
-        super().copyAttributes(prototype)
-
-    def clone(parent,id,couleur,x,y,montype, prototype):       
-        return PigPen(parent,id,couleur,x,y,montype, prototype)
+class PigPen():
+    def __init__(self,parent,id,couleur,x,y,montype):
+        Batiment.__init__(self,parent,id,x,y)
+        self.image=couleur[0]+"_"+montype
+        self.montype=montype
+        self.maxperso=20
+        self.perso=0
+        # Stats de defenses 
+        self.health = 500
+        self.defense = 2
         
 class Daim():
     def __init__(self,parent,id,x,y):
@@ -464,8 +421,6 @@ class Perso():
             self.x=x
             self.y=y
             
-            self.movingIn = False
-            
             # S'ajoute sur la map
             caseX,caseY = self.parent.parent.trouvercase(x, y)           
             self.parent.parent.hashmap[caseX][caseY]["persos"].append(self)    
@@ -484,7 +439,6 @@ class Perso():
 
         else: # Le prototype de base va avoir ces stats. Tout les clones vont copier les attributs du prototype
             self.health = 0
-            self.maxHealth = 0
             self.defense = 0
             self.vitesse = 5
             self.champvision = 200
@@ -500,7 +454,6 @@ class Perso():
 
     def copyAttributes(self, prototype):  # MUST BE TESTED
         self.health = prototype.health
-        self.maxHealth = prototype.health
         self.defense = prototype.defense
         self.vitesse = prototype.vitesse
         self.champvision = prototype.champvision
@@ -550,7 +503,7 @@ class Perso():
                 self.parent.parent.silo.ajustLoyalty()
             
     def deplacer(self):
-        if self.cible and self.movingIn:
+        if self.cible:
             ang=Helper.calcAngle(self.x,self.y,self.cible[0],self.cible[1])  
             x,y=Helper.getAngledPoint(ang,self.vitesse,self.x,self.y)
             
@@ -585,7 +538,7 @@ class Perso():
     def attack(self):        
         if self.attackTarget and self.attackTarget.alive:    # Cible pas dead
             if Helper.withinDistance(self.x, self.y, self.attackTarget.x, self.attackTarget.y, self.atkRange):    # Range d'attack
-                self.movingIn = False   # Arrêt du mouvement si peut attaquer à distance
+                self.cible = None   # Arrêt du mouvement si peut attaquer à distance
                 if self.canAttack:  # Si le cooldown de l'attaque est terminé
                     self.attackTarget.health = self.dealDamage(self.attackTarget)
                     self.attackTimer.set(self.atkSpeed) # Start cooldown pour prochaine attaque quand même. Tuer une cible ne reset pas le cooldown d'attaque
@@ -595,11 +548,9 @@ class Perso():
                 if self.attackTarget.health <= 0: # Si la cible meurt ici, faut arrêter de la target
                     self.attackTarget.die() # et la buter
                     self.resetAction()
+                    
                 return
-            else:
-                if self.movingIn == False:
-                    self.movingIn = True
-                        
+            
             if self.cible == None:
                 self.cibler([self.attackTarget.x, self.attackTarget.y])
         else:
@@ -620,7 +571,6 @@ class Perso():
         return target.health - dmg
 
     def resetAction(self):
-        self.movingIn = False
         self.cible = self.attackTarget = self.actioncourante = None
 
 
@@ -632,12 +582,9 @@ class Perso():
         self.parent.addToListOfDeadStuff(True, self.type, self.id) # S'ajoute à la liste des choses qui sont dead
 
         # Retire de la tile map
-        tile = self.parent.parent.findTileInHashMap(self.x, self.y) 
-        if self in tile["persos"]:    # safety measures
-            tile["persos"].remove(self)
-        # if self in self.parent.parent.hashmap[tile[0]][tile[1]]["persos"]:    # safety measures
-        #     self.parent.parent.hashmap[tile[0]][tile[1]]["persos"].remove(self)    
-        #     print("done")
+        tile = self.parent.parent.trouvercase(self.x, self.y) 
+        if self in self.parent.parent.hashmap[tile[0]][tile[1]]["persos"]:    # safety measures
+                    self.parent.parent.hashmap[tile[0]][tile[1]]["persos"].remove(self)    
 
 
     def cibler(self,pos):
@@ -647,8 +594,6 @@ class Perso():
         else:
             self.dir="G"
         self.image=self.image[:-1]+self.dir
-
-        self.movingIn = True
 
 
     # Une autre méthodes pourrait être intégré pour prioriser les ennemies les plus 'dangereux', au besoin
@@ -681,6 +626,77 @@ class Perso():
         else:
             return False
 
+
+
+class Soldat(Perso):
+    def __init__(self,parent,id,maison,couleur,x,y,montype, prototype = None):
+        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
+        
+        if prototype:
+            self.copyAttributes(prototype)
+        else:
+            # Stats de combats
+            self.health = 100
+            self.defense = 0
+            self.atkDmg = 6
+            self.atkSpeed = 5
+
+    def copyAttributes(self, prototype):
+        super().copyAttributes(prototype)
+
+    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
+        return Soldat(parent,id,batiment,couleur,x,y,montype, prototype)
+
+class Archer(Perso):
+    def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
+        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
+        
+        if prototype:
+            self.copyAttributes(prototype)
+        else:
+            # Stats de combats
+            self.health = 60
+            self.defense = 0
+            self.atkRange = 30   
+            self.atkSpeed = 7
+
+    def copyAttributes(self, prototype):
+        super().copyAttributes(prototype)
+
+    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
+        return Archer(parent,id,batiment,couleur,x,y,montype, prototype)
+
+
+class Chevalier(Perso):
+    def __init__(self,parent,id,maison,couleur,x,y,montype, prototype = None):
+        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
+        
+        if prototype:
+            self.copyAttributes(prototype)
+        else:
+            # Stats de combats
+            self.health = 200
+            self.defense = 1
+            self.armorType = ARMOR_TYPES.HEAVY
+            self.atkDmg = 15
+            self.atkSpeed = 2
+
+    def copyAttributes(self, prototype):
+        super().copyAttributes(prototype)
+
+    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
+        return Chevalier(parent,id,batiment,couleur,x,y,montype, prototype)
+
+class Druide(Perso):
+    def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
+        Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
+
+    def copyAttributes(self, prototype):
+        super().copyAttributes(prototype)
+
+    def clone(parent,id,batiment,couleur,x,y,montype, prototype):       
+        return Druide(parent,id,batiment,couleur,x,y,montype, prototype)
+
 class Chicken(Perso):
     def __init__(self,parent,id,maison,couleur,x,y,montype,prototype = None):
         Perso.__init__(self,parent,id,maison,couleur,x,y,montype, prototype)
@@ -689,7 +705,7 @@ class Chicken(Perso):
             self.copyAttributes(prototype)
         else:
             # Stats de combats
-            self.health = self.maxHealth = 200
+            self.health = 200
             self.defense = 1
             self.armorType = ARMOR_TYPES.LIGHT
             self.atkDmg = 15
@@ -711,7 +727,7 @@ class Pig(Perso):
             self.copyAttributes(prototype)
         else:
             # Stats de combats
-            self.health = self.maxHealth = 400
+            self.health = 400
             self.defense = 1
             self.armorType = ARMOR_TYPES.HEAVY
             self.atkDmg = 30
@@ -742,13 +758,12 @@ class Ouvrier(Perso):
             # Actions supplémentaires
             self.actions["gather"] = self.ramasserressource
             self.actions["hunt"] = self.chasserressource
-            self.tickInactive=0
             #self.actions["build"] = self.build
 
         else:
             # Stats du prototype de base
             self.vitesse=random.randrange(5)+5
-            self.health = self.maxHealth = 50
+            self.health = 50
             self.defense = 0
             self.atkDmg = 2
             self.atkSpeed = 5
@@ -757,8 +772,6 @@ class Ouvrier(Perso):
             # Attributs uniques aux ouvriers
             self.quota=20 
             self.champchasse= 120
-            self.dejavisite=[]
-            
             
         self.tickInactive=0
 
@@ -968,6 +981,10 @@ class Ouvrier(Perso):
         
 class Joueur():
     classespersos={"ouvrier":Ouvrier,
+                   "soldat":Soldat,
+                   "archer":Archer,
+                   "chevalier":Chevalier,
+                   "druide":Druide,
                    "chicken":Chicken,
                    "pig":Pig}
     def __init__(self,parent,id,nom,couleur, x,y):
@@ -991,21 +1008,24 @@ class Joueur():
                          "aureus":200}
         
         self.persos={"ouvrier":{},
+                    "soldat":{},
+                    "archer":{},
+                    "chevalier":{},
+                    "druide":{},
                     "chicken":{},
                     "pig":{}}
         
-        self.prototypePersos={"ouvrier": self.classespersos["ouvrier"](None, None, None,None,None,None,None,None), #none! yep, overloading constructor would prevent that.
+        self.prototypePersos={"ouvrier": self.classespersos["ouvrier"](None, None, None,None,None,None,None,None), #none! yep, overloading stuff would prevent that.
+                    "soldat":self.classespersos["soldat"](None, None, None,None,None,None,None,None),
+                    "archer":self.classespersos["archer"](None, None, None,None,None,None,None,None),
+                    "chevalier":self.classespersos["chevalier"](None, None, None,None,None,None,None,None),
+                    "druide":self.classespersos["druide"](None, None, None,None,None,None,None,None),
                     "chicken":self.classespersos["chicken"](None, None, None,None,None,None,None,None),
                     "pig":self.classespersos["pig"](None, None, None,None,None,None,None,None)}
 
-        self.prototypeBatiments={"maison": self.parent.classesbatiments["maison"](None, None, None,None,None,None,None), 
-                    "abri":self.parent.classesbatiments["abri"](None, None, None,None,None,None,None),
-                    "chickenCoop":self.parent.classesbatiments["chickenCoop"](None, None, None,None,None,None,None),
-                    "pigPen":self.parent.classesbatiments["pigPen"](None, None, None,None,None,None,None)
-                    }
-
         self.batiments={"maison":{},
                        "abri":{},
+                       "caserne":{},
                        "chickenCoop":{},
                        "pigPen":{}}
         
@@ -1028,7 +1048,6 @@ class Joueur():
         # on va creer une maison comme centre pour le joueur
         self.creerpointdorigine(x,y)
         self.completedUpgrades = {}     # ex : {"Protein shakes": ProteinShake}
-        UpgradeRegistry.UPGRADES["Defense Tier 3"].effect(self)
         
     def addToListOfDeadStuff(self, isPerso, type, id):
         if isPerso:
@@ -1105,7 +1124,7 @@ class Joueur():
     # Ajouter les unités et bâtiments qu'on veut à l'initialisation ici   
     def creerpointdorigine(self,x,y):
         idmaison=getprochainid()
-        self.batiments["maison"][idmaison]=Maison(self,idmaison,self.couleur,x,y,"maison",self.prototypeBatiments["maison"])
+        self.batiments["maison"][idmaison]=Maison(self,idmaison,self.couleur,x,y,"maison")
         self.creerperso(["ouvrier","maison",idmaison,[]])
         
         # Pour debug plus rapidement
@@ -1225,10 +1244,15 @@ class Partie():
         self.delaiprochaineaction=20
         self.joueurs={}
         self.classesbatiments={"maison":Maison,
+                        "caserne":Caserne,
                         "abri":Abri,
                         "chickenCoop":ChickenCoop,
                         "pigPen":PigPen}
         self.classespersos={"ouvrier":Ouvrier,
+                    "soldat":Soldat,
+                    "archer":Archer,
+                    "chevalier":Chevalier,
+                    "druide":Druide,
                     "chicken":Chicken,
                     "pig":Pig}
         self.ressourcemorte=[]

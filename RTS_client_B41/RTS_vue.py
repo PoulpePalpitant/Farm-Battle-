@@ -75,24 +75,23 @@ class Vue():
     
     def creercadreouvrier(self,coul,artefact):
         self.cadreouvrier=Frame(self.cadreaction)
-                
         for i in artefact:
             btn=Button(self.cadreouvrier,text=i,image=self.images[coul+i])
             btn.bind("<Button>",self.batirartefact)
             btn.pack()    
              
 ###### LES CADRES ############################################################################################        
-    # Appel de la crÃ©ation des divers cadre   
+    # Appel de la création des divers cadre   
     def creercadres(self,urlserveur,nomDuJoueur,testdispo):
         self.cadres["splash"]=self.creercadresplash(urlserveur,nomDuJoueur,testdispo)
         self.cadres["lobby"]=self.creercadrelobby()
         self.cadres["jeu"]=self.creercadrejeu()
     
-    # le splash (ce qui 'splash' Ã  l'Ã©cran lors du dÃ©marrage) 
+    # le splash (ce qui 'splash' à l'écran lors du démarrage) 
     # sera le cadre visuel initial lors du lancement de l'application
     def creercadresplash(self,urlserveur,nom,testdispo):
         self.cadresplash=Frame(self.cadreapp)
-        # un canvas est utilisÃ© pour 'dessiner' les widgets de cette fenÃªtre voir 'create_window' plus bas
+        # un canvas est utilisé pour 'dessiner' les widgets de cette fenêtre voir 'create_window' plus bas
         self.canevassplash=Canvas(self.cadresplash,width=640,height=480,bg="wheat1")
         self.canevassplash.pack()
         
@@ -101,7 +100,7 @@ class Vue():
         self.etatdujeu=Label(text="Jeu",font=("Arial",18),borderwidth=2,relief=RIDGE)
         self.nomsplash=Entry(font=("Arial",14))
         self.urlsplash=Entry(font=("Arial",14))
-        # on insÃ¨re les infos par dÃ©faut (nom url) et reÃ§u au dÃ©marrage (dispo)
+        # on insère les infos par défaut (nom url) et reçu au démarrage (dispo)
         self.nomsplash.insert(0, nom)
         self.urlsplash.insert(0, urlserveur)
         # on les place sur le canevassplash
@@ -134,9 +133,9 @@ class Vue():
         self.canevassplash.create_window(220,440,window=radciv4,width=180,height=30)
         ## FIN de l'exemple des choix de civilisations
         
-        # on met Ã  jour les champs et widgets
+        # on met à jour les champs et widgets
         self.updatesplash(testdispo)
-        # on retourne ce cadre pour l'insÃ©rer dans le dictionnaires des cadres
+        # on retourne ce cadre pour l'insérer dans le dictionnaires des cadres
         return self.cadresplash
                     
     def creercadrelobby(self):
@@ -145,20 +144,20 @@ class Vue():
         self.canevaslobby=Canvas(self.cadrelobby,width=640,height=480,bg="lightblue")
         self.canevaslobby.pack()
         # widgets du lobby
-        # un listbox pour afficher les joueurs inscrit pour la partie Ã  lancer
+        # un listbox pour afficher les joueurs inscrit pour la partie à lancer
         self.listelobby=Listbox(borderwidth=2,relief=GROOVE)
-        # et un widget pour inscrire le nombre d'IA Ã  crÃ©er - EN ATTENTE DE L'IA ACTUELLEMENT INCOMPLÃˆTE
+        # et un widget pour inscrire le nombre d'IA à créer - EN ATTENTE DE L'IA ACTUELLEMENT INCOMPLÈTE
         self.labnbrIA=Label(text="IAs",font=("Arial",18),bg="lightblue")
         self.champnbrIA=Entry(width=16)
         self.champnbrIA.insert(END,0)
-        # bouton pour lancer la partie, uniquement accessible Ã  celui qui a creer la partie dans le splash
+        # bouton pour lancer la partie, uniquement accessible à celui qui a creer la partie dans le splash
         self.btnlancerpartie=Button(text="Lancer partie",state=DISABLED,command=self.lancerpartie)
         # affichage des widgets dans le canevaslobby (similaire au splash)
         self.canevaslobby.create_window(440,240,window=self.listelobby,width=200,height=400)
         self.canevaslobby.create_window(170,300,window=self.labnbrIA,width=50,height=30)
         self.canevaslobby.create_window(230,300,window=self.champnbrIA,width=50,height=30)
         self.canevaslobby.create_window(200,400,window=self.btnlancerpartie,width=100,height=30) 
-        # on retourne ce cadre pour l'insÃ©rer dans le dictionnaires des cadres  
+        # on retourne ce cadre pour l'insérer dans le dictionnaires des cadres  
         return self.cadrelobby
     
     def creercadrejeu(self):
@@ -173,13 +172,13 @@ class Vue():
         # configuration de la section qui s'etire lorsque la fenetre change de taille
         self.cadrepartie.rowconfigure(0, weight=1)
         self.cadrepartie.columnconfigure( 0, weight=1)
-        # on retourne ce cadre pour l'insÃ©rer dans le dictionnaires des cadres
+        # on retourne ce cadre pour l'insérer dans le dictionnaires des cadres
         return self.cadrepartie
         
     def creerairedejeu(self):
         # definition du cadre avec le canvas de jeu et les scrollbars
         self.cadrecanevas=Frame(self.cadrepartie)
-        # on crÃ©e les scrollbar AVANT le canevas de jeu car le canevas est dÃ©pendant de leur 
+        # on crée les scrollbar AVANT le canevas de jeu car le canevas est dépendant de leur 
         self.scrollV=Scrollbar(self.cadrecanevas,orient=VERTICAL)
         self.scrollH=Scrollbar(self.cadrecanevas,orient=HORIZONTAL)
         self.canevas=Canvas(self.cadrecanevas,width=500,height=400,bg="DarkOliveGreen2",
@@ -196,7 +195,7 @@ class Vue():
         
         # visualise le cadre qui contient le canevas de jeu
         self.cadrecanevas.grid(column=0,row=0,sticky=N+S+E+W)
-        # on doit preciser quelle partie de la grille (grid) va s'accroitre, colonne et rangÃ©e
+        # on doit preciser quelle partie de la grille (grid) va s'accroitre, colonne et rangée
         # ici on precise que c'est le canevas et non les scrollbar qui doit s'agrandir
         self.cadrecanevas.rowconfigure(1, weight=1)
         self.cadrecanevas.columnconfigure( 0, weight=1)
@@ -249,7 +248,7 @@ class Vue():
         self.minicarte.grid(row=2,column=0,columnspan=2)
         self.minicarte.bind("<Button-1>",self.deplacercarte)
         
-        # on retourne ce cadre pour l'insÃ©rer dans le dictionnaires des cadres  
+        # on retourne ce cadre pour l'insérer dans le dictionnaires des cadres  
         self.canevasaction.rowconfigure(0, weight=1)
         self.cadreaction.rowconfigure(0, weight=1)
     
@@ -301,7 +300,7 @@ class Vue():
         self.cadreparler.pack(expand=1,fill=X)
                 
     def connecterevent(self):
-        # on attache (bind) desF Ã©vÃ©nements soit aux objets eux mÃªme
+        # on attache (bind) desF événements soit aux objets eux même
         self.canevas.bind("<Button-1>",self.annuleraction)
         self.canevas.bind("<Button-2>",self.construirebatiment)
         # faire une multiselection
@@ -310,9 +309,9 @@ class Vue():
         self.canevas.bind("<Shift-ButtonRelease-1>",self.selectfinir)
         
         self.canevas.bind("<Button-3>",self.indiquerposition)
-        # soit aux dessins, en vertu de leur tag (propriÃ©tÃ©s des objets dessinÃ©s)
-        # ALL va rÃ©agir Ã  n'importe quel dessin
-        # sinon on spÃ©cifie un tag particulier, exemple avec divers tag, attachÃ© par divers Ã©vÃ©nements
+        # soit aux dessins, en vertu de leur tag (propriétés des objets dessinés)
+        # ALL va réagir à n'importe quel dessin
+        # sinon on spécifie un tag particulier, exemple avec divers tag, attaché par divers événements
         self.canevas.tag_bind("batiment","<Button-1>",self.creerentite)
         self.canevas.tag_bind("perso","<Button-1>",self.ajoutselection)
 
@@ -327,7 +326,7 @@ class Vue():
         
         self.canevas.tag_bind("silo","<Button-3>",self.indiquerposition)
     
-    # cette mÃ©thode sert Ã  changer le cadre (Frame) actif de la fenÃªtre, on n'a qu'Ã  fournir le cadre requis
+    # cette méthode sert à changer le cadre (Frame) actif de la fenêtre, on n'a qu'à fournir le cadre requis
     def changercadre(self,nomcadre):
         cadre=self.cadres[nomcadre]
         if self.cadreactif:
@@ -470,6 +469,9 @@ class Vue():
             if "maison" in mestags:
                 pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
                 action=[self.parent.nomDuJoueur,"creerperso",["ouvrier",mestags[4],mestags[1],pos]]
+            if "caserne" in mestags:
+                pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
+                action=[self.parent.nomDuJoueur,"creerperso",["soldat",mestags[4],mestags[1],pos]]
             if "chickenCoop" in mestags:
                 pos=(self.canevas.canvasx(evt.x),self.canevas.canvasy(evt.y))
                 action=[self.parent.nomDuJoueur,"creerperso",["chicken",mestags[4],mestags[1],pos]]
@@ -564,7 +566,7 @@ class Vue():
                 self.infohud["Roche"][0].set(self.modele.joueurs[j].ressources["roche"])
                 self.infohud["Aureus"][0].set(self.modele.joueurs[j].ressources["aureus"])
         
-            # ajuster les persos de chaque joueur et leur dÃ©pendance (ici javelots des ouvriers)
+            # ajuster les persos de chaque joueur et leur dépendance (ici javelots des ouvriers)
             for p in self.modele.joueurs[j].persos.keys():    
                 for k in self.modele.joueurs[j].persos[p].keys():
                     i=self.modele.joueurs[j].persos[p][k]
@@ -572,30 +574,16 @@ class Vue():
                     self.canevas.create_image(i.x,i.y,anchor=S,image=self.images[i.image],
                                               tags=(j,k,"artefact","mobile","perso",p))
                     
-                    # Ceci est l'endroit ou l'affichage des healthbar Ã  lieu
                     if k in self.action.persochoisi:
-                        self.canevas.create_rectangle(i.x-10,i.y+5,i.x+10,i.y+10,fill="black",tags=(j,k,"artefact","mobile","persochoisi"))
-                        self.canevas.create_rectangle(i.x-10,i.y+5,i.x + (i.health / i.maxHealth) * 20 - 10, i.y + 10  ,fill="green",tags=(j,k,"artefact","mobile","persochoisi"))
-                    else:
-                        self.canevas.create_rectangle(i.x-10,i.y+5,i.x + 10,i.y+10,fill="black",tags=(j,k,"artefact","mobile","persochoisi"))
-                        self.canevas.create_rectangle(i.x-10,i.y+5,i.x + (i.health / i.maxHealth) * 20 - 10, i.y + 10 ,fill="yellow",tags=(j,k,"artefact","mobile","persochoisi"))
+                        self.canevas.create_rectangle(i.x-10,i.y+5,i.x+10,i.y+10,fill="yellow",
+                                                      tags=(j,k,"artefact","mobile","persochoisi"))
                         
                     # dessiner javelot de l'ouvrier
                     if p=="ouvrier":
                         for b in self.modele.joueurs[j].persos[p][k].javelots:
-                            self.canevas.create_image(b.x,b.y,image=self.images[b.image],tags=(j,b.id,"artefact","mobile","javelot"))
-
-            # Barre de vie des bÃ¢timents                            
-            for k in self.modele.joueurs[j].batiments.keys():    
-                for l in self.modele.joueurs[j].batiments[k].keys():
-                    i = self.modele.joueurs[j].batiments[k][l]
-                    if i in self.action.persochoisi:
-                        self.canevas.create_rectangle(i.x-10,i.y+25,i.x+10,i.y+30,fill="black",tags=(j,k,"artefact","mobile"))
-                        self.canevas.create_rectangle(i.x-10,i.y+25,i.x + (i.health / i.maxHealth) * 20 - 10, i.y +30  ,fill="green",tags=(j,k,"artefact","mobile"))
-                    else:
-                        self.canevas.create_rectangle(i.x-10,i.y+25,i.x+10,i.y + 30,fill="black",tags=(j,k,"artefact","mobile"))
-                        self.canevas.create_rectangle(i.x-10,i.y+25,i.x + (i.health / i.maxHealth) * 20 - 10, i.y +30 ,fill="yellow",tags=(j,k,"artefact","mobile"))
-
+                            self.canevas.create_image(b.x,b.y,image=self.images[b.image],
+                                              tags=(j,b.id,"artefact","mobile","javelot"))
+        
         # ajuster les choses vivantes dependantes de la partie (mais pas des joueurs) 
         for j in self.modele.biotopes["daim"].keys():
             i=self.modele.biotopes["daim"][j]
@@ -695,7 +683,7 @@ class Action():
             self.parent.parent.actionsrequises=action
 
     def setAttackTarget(self,tag):
-        # Pour target, voici les tags nÃ©cessaires:
+        # Pour target, voici les tags nécessaires:
         # targetId, isPerso, targetType, enemyPlayerName, self.persochoisi 
 
         if self.persochoisi:
@@ -778,4 +766,3 @@ class Champ(Label):
         Label.__init__(self,master,*args, **kwargs)
         self.config(font=("arial",13,"bold"))
         self.config(bg="goldenrod3")
-
