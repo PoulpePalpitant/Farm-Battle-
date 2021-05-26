@@ -87,7 +87,8 @@ class Controleur():
             return "impossible"
     
     # a partir du splash, permet de creer une partie (lance le lobby pour permettre a d'autres joueurs de se connecter)
-    # l'argument valciv n'est pas utilise pour l'INSTANT, elle sert de recette pour envoyer des parameters lors de la demande de creation d'une partie
+    # l'argument valciv n'est pas utilise pour l'INSTANT, elle sert de recette pour envoyer d
+    # es parameters lors de la demande de creation d'une partie
     # on pourrait ainsi deja fournir des options de jeu
     def creerpartie(self,nom,urljeu,valciv):
         if self.prochainsplash:
@@ -230,8 +231,8 @@ class Controleur():
     # peut generer UN NOM EXISTANT mais c'est rare, NON GERER PAR LE SERVEUR        
     
     def generernom(self): 
-        nomDuJoueur="JAJA_"+str(random.randrange(100,1000))
-        return nomDuJoueur
+        monnom="JM_"+str(random.randrange(100,1000))
+        return monnom
     
     # fonction d'appel normalisee, utiliser par les methodes du controleur qui communiquent avec le serveur
     def appelserveur(self,url,params):
@@ -249,6 +250,9 @@ class Controleur():
         
     def afficherbio(self,bio):
         self.vue.afficherbio(bio)
+    
+    def ajustSiloLoyalty(self):
+        self.vue.changeSiloLoyalty = 1
 
 if __name__ == '__main__':
     c=Controleur()
