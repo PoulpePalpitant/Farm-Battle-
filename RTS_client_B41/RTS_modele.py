@@ -5,80 +5,19 @@ import random
 import math
 from helper import Helper
 from RTS_divers import *
-from _overlapped import NULL
 from RTS_upgrades import *
 
 class DebugSettings(): # Va permettre de dbug bien des affaires
-    debugMode = True            
-    showAttackRange = True      # Indicateur du range d'attack des unités
-    
     # Settings de lancement de partie
     spawnPlayersNearby = False   # Spawn tout les joueurs très proche
-    generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
+    generateAi = 0           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
     createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
-    quickStart = True           # Reset create et launch une partie, immédiatement
 
-class ARMOR_TYPES():
-    LIGHT = 'LIGHT'
-    HEAVY = 'HEAVY'
-    SUPRA_HARD = 'SUPRA_HARD'
-
-class SimpleTimer():
-    def __init__(self, parent, interval):
-        self.parent = parent
-        self.interval = interval
-        self.counter = 0
-        self.running = True
-    # Une alternative serait de juste setté un point future, et de checker si on est rendu
-    # AddDelay(time + duration)
-    # tick -> if time >= pointfuture: 
-    #             timer est finit
-
-
-    def set(self, interval):
-        try :
-            if interval > 0:  # Pas de counter négatif
-                self.counter = 0
-                self.interval = interval
-                self.running = True
-        except ValueError :
-                print("Timer null ou négatif is no bueno")
-    
-    def isRunning(self): 
-        return self.running 
-
-    def tick(self):
-        self.counter += 1 
-
-        if self.counter >= self.interval: 
-            self.running = False
-            return True # Counter finis
-        else:
-            return False
-
-    def start(self):  
-        self.counter = 0
-        self.running = True
-
-    def stop(self): 
-        self.counter = self.interval = 0
-
-
-
-class DebugSettings(): # Va permettre de dbug bien des affaires
-    debugMode = True            
-    showAttackRange = True      # Indicateur du range d'attack des unités
-    
-    # Settings de lancement de partie
-    spawnPlayersNearby = True   # Spawn tout les joueurs très proche
-    generateAi = True           # Start une game avec des ai (pour l'instant ce sont des joueurs inactifs)
-    createAllUnitsAndBuildings = False   # Créer tout les bâtiments et unités qui existent lors du lancement du jeu
-    quickStart = True           # Reset create et launch une partie, immédiatement
 
 class ARMOR_TYPES():
     LIGHT = 'LIGHT'
     MEDIUM= 'MEDIUM'
-    HEAVY = 'MEDIUM'
+    HEAVY = 'HEAVY'
     SUPRA_HARD = 'SUPRA_HARD'
 
 class SimpleTimer():
@@ -305,11 +244,6 @@ class PigPen(Batiment):
 
     def clone(parent,id,couleur,x,y,montype, prototype):       
         return PigPen(parent,id,couleur,x,y,montype, prototype)
-        
-        # Stats de defenses 
-        self.health = 300
-        self.defense = 2
-        self.armor = ARMOR_TYPES.HEAVY
 
 class Daim():
     def __init__(self,parent,id,x,y):

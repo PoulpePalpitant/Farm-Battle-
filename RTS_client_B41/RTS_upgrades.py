@@ -1,7 +1,7 @@
 
 # Classe mère de tout les upgrades
 # --------------------------------
-class UpgradeTest():
+class Upgrade():
     def __init__(self, param):
         name, description, productionTime, cost, prerequisites, img = param    # Les arguments doivent être passés dans cet ordre là
 
@@ -24,7 +24,7 @@ class UpgradeTest():
 
 class ProteinShake():
     def __init__(self):
-        UpgradeTest.__init__(self, # Parent constructor
+        Upgrade.__init__(self, # Parent constructor
         ["Protein shakes",
          "Augmente la quantité de ressources que peut transporter tout les slaves de 50%", # Une description        
         None,   # Time
@@ -43,7 +43,7 @@ class ProteinShake():
 
 class BetterShoes():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Better shoes",
          "Augmente la vitesse de déplacement des slaves de 50%",    
         None,  
@@ -62,7 +62,7 @@ class BetterShoes():
 
 class Scope():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Scope",
          "Augmente la distance d'attaque des chickens de 100%",    
         None,  
@@ -81,7 +81,7 @@ class Scope():
 
 class SuperPigs():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Super pigs",
          "Améliore les pigs en super pigs, mieux armés et plus puissants. Peut maintenant produire des super pigs",    
         None,  
@@ -104,7 +104,7 @@ class SuperPigs():
 
 class DefenseTier1():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Defense Tier 1",
          "Augmente la défense de tous les unités de +1",    
         None,  
@@ -123,7 +123,7 @@ class DefenseTier1():
 
 class DefenseTier2():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Defense Tier 2",
          "Augmente la défense de tous les unités de + 1",    
         None,  
@@ -141,7 +141,7 @@ class DefenseTier2():
 
 class DefenseTier3():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Defense Tier 3",
          "Augmente la défense de tous les unités de + 2",    # Augmente de +2. Ceci récompense le joueur pour commit dans ses upgrades
         None,  
@@ -159,7 +159,7 @@ class DefenseTier3():
 
 class AttackTier1():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Attack Tier 1",
          "Augmente les dégât infligés de tous les unités de +1",    
         None,  
@@ -178,7 +178,7 @@ class AttackTier1():
 
 class AttackTier2():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Attack Tier 2",
          "Augmente les dégât infligés de tous les unités de + 1",    
         None,  
@@ -196,7 +196,7 @@ class AttackTier2():
 
 class AttackTier3():
     def __init__(self):
-        UpgradeTest.__init__(self, 
+        Upgrade.__init__(self, 
         ["Attack Tier 3",
          "Augmente les dégât infligés de tous les unités de + 2",   
         None,  
